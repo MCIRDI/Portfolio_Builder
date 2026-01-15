@@ -1,0 +1,23 @@
+.register-section {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+}
+
+    .register-section p {
+        margin-right: 20px;
+    }
+
+@media only screen and (max-width: 700px) {
+    .header-content {
+        flex-direction: column;
+    }
+
+    .register-section {
+        margin-top: 10px;
+
+    }
+    header{
+        padding-bottom:5px;
+    }
+}
