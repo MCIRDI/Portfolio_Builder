@@ -2,9 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\public",
-    "\\src",
-    "\\src\\assets"
+    "\\src"
   ],
-  "SelectedNode": "\\src\\login.jsx",
+  "SelectedNode": "\\src\\Edit.css",
   "PreviewInSolutionExplorer": false
 }
