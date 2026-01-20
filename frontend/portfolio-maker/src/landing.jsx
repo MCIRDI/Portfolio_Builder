@@ -6,7 +6,8 @@ import { Link } from "react-router-dom";
 function Landing() {
   const [page, setPage] = useState(0);
   return (
-    <>
+      <>
+
       <header>
         <div className="header-content">
           <div className="logo-block">
