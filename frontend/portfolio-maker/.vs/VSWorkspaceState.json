@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\public",
-    "\\src"
+    "\\src",
+    "\\src\\assets"
   ],
-  "SelectedNode": "\\src\\Edit.css",
+  "SelectedNode": "\\src\\assets\\icon-placeholder.svg",
   "PreviewInSolutionExplorer": false
 }

@@ -145,6 +145,7 @@
         max-height: 400px;
         overflow: hidden;
         width: 80%;
+        margin:0;
     }
         .news-top .publication-img img {
             width: 100%;
@@ -165,4 +166,24 @@
     header {
         padding-bottom: 5px;
     }
+}
+
+@media only screen and (max-width: 985px) {
+.publication-block-top{
+    flex-direction:column;
+}
+
+.publication-img{
+    margin:0;
+}
+
+}
+
+@media only screen and (max-width: 600px) {
+    .edit-button, .remove-button{
+        width:auto;
+        height:auto;
+    }
+
+
 }

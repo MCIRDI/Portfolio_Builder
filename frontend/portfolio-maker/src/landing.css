@@ -150,10 +150,15 @@ body {
 .landing-image-home {
     width: 20em;
 }
+    .landing-image-home img {
+        width: 400px;
+        border-radius: 12px;
+    }
 .landing-text-address {
     display: flex;
     justify-content: center;
     align-items: center;
+    width:100%;
 }
     .landing-text-address a svg {
 
@@ -181,6 +186,14 @@ body {
     padding: 25px 0 25px 0;
     color: white;
 }
+.landing-text-home {
+    max-width: 600px;
+    margin-left: 100px;
+    margin-right:100px;
+}
+.landing-text-image {
+    flex-direction: row;
+}
 
 
 @media only screen and (max-width: 399px) {
@@ -194,6 +207,18 @@ body {
 
     .header-content > div {
         padding: 0 5px 0 5px;
+    }
+    .landing-text-home {
+        max-width: 600px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+    .landing-image-home img {
+        width: 100px;
+        border-radius: 12px;
+    }
+    .landing-text-image {
+        flex-direction: column;
     }
 
 }
@@ -213,9 +238,21 @@ body {
     .header-content > div {
         padding: 0 10px 0 10px;
     }
+    .landing-image-home img {
+        width: 150px;
+        border-radius: 12px;
+    }
+    .landing-text-home {
+        max-width: 600px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+
 }
 
 @media only screen and (min-width: 600px) {
+
 /*    .logo-block {
         display: block;
         width: 4.5em;
@@ -246,7 +283,15 @@ body {
         margin-bottom:20px;
 
     }
+    .landing-image-home img {
+        width: 200px;
+        border-radius: 12px;
+    }
+    .landing-text-home {
 
+        margin-left: 10px;
+        margin-right: 10px;
+    }
 }
 
 @media only screen and (min-width: 800px) {
@@ -280,6 +325,15 @@ body {
     .landing-text-address {
         margin-bottom: 30px;
     }
+    .landing-image-home img {
+        width: 250px;
+        border-radius: 12px;
+    }
+    .landing-text-home {
+        max-width: 600px;
+        margin-left: 100px;
+        margin-right: 100px;
+    }
 }
 @media only screen and (min-width: 1000px) {
     .logo-block {
@@ -307,6 +361,11 @@ body {
     .landing-text-address {
         margin-bottom: 50px;
     }
+    .landing-image-home img {
+        width: 350px;
+        border-radius: 12px;
+    }
+
 }
 @media only screen and (min-width: 1500px) {
 
