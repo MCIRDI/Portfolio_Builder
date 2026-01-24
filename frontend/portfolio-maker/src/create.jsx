@@ -1,81 +1,81 @@
-import { useState } from "react";
 import mainLogo from "./assets/icon-placeholder.svg";
 import "./landing.css";
 import "./home.css";
 import "./edit.css";
 
-import { Link, useParams } from "react-router-dom";
-
-
-
-
+import { Link } from "react-router-dom";
+import { createPublication } from "./services/publications";
 
 function Create() {
-    const [page, setPage] = useState(0);
-    const { username, id } = useParams();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    console.log(username);
-    console.log(id);
+    const data = new FormData();
+    data.append("name", e.target.title.value);
+    data.append("description", e.target.desc.value);
+    data.append("image", e.target.image.files[0]);
+    try {
+      await createPublication(data);
+      alert("Created successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Create failed");
+    }
+  };
 
-    return (
-        <>
-            <header>
-                <div className="header-content">
-                    <div className="logo-block">
-                        <img src={mainLogo} alt="logo"></img>
-                    </div>
-                    <div className="register-section share">
-                        <p>Made with PortfolioMaker</p>
+  return (
+    <>
+      <header>
+        <div className="header-content">
+          <div className="logo-block">
+            <img src={mainLogo} alt="logo"></img>
+          </div>
+          <div className="register-section share">
+            <p>Made with PortfolioMaker</p>
+          </div>
 
-                    </div>
+          <div className="register-section">
+            {/* Username is needed there */}
+            <p>USERNAMEPLACEHOLDER</p>
+          </div>
+        </div>
+      </header>
 
+      <div className="landing-block">
+        <div className="landing-block-content active">
+          <div className="publication-block">
+            <form onSubmit={handleSubmit}>
+              <label htmlFor="title">Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="Enter title"
+              />
 
-                    <div className="register-section">
-                        {/* Username is needed there */}
-                        <p>USERNAMEPLACEHOLDER</p>
-                    </div>
-                </div>
-            </header>
+              <label htmlFor="image">Image</label>
+              <input type="file" id="image" name="image" accept="image/*" />
 
+              <label htmlFor="desc">Description</label>
+              <textarea
+                id="desc"
+                name="desc"
+                rows="5"
+                placeholder="Enter description"
+              ></textarea>
 
-            <div className="landing-block">
-
-
-                <div className="landing-block-content active">
-
-                    <div className="publication-block">
-                        <form>
-                            <label for="title">Title</label>
-                            <input type="text" id="title" name="title" placeholder="Enter title" />
-
-                            <label for="image">Image</label>
-                            <input type="file" id="image" name="image" accept="image/*" />
-
-                            <label for="desc">Description</label>
-                            <textarea id="desc" name="desc" rows="5" placeholder="Enter description"></textarea>
-
-                            <div className="publication-button-section">
-                                <button type="submit">Create</button>
-                                <Link to="/home">
-                                    <button className="red">Return</button>
-                                </Link>
-                            </div>
-
-                        </form>
-
-
-                    </div>
-
-
-                </div>
-
-
-            </div >
-
-
-
-        </>
-    );
+              <div className="publication-button-section">
+                <button type="submit">Create</button>
+                <Link to="/home">
+                  <button className="red">Return</button>
+                </Link>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default Create;

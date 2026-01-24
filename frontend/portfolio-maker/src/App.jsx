@@ -10,29 +10,20 @@ import Edit from "./edit.jsx";
 import Create from "./create.jsx";
 
 function App() {
-
-    return (
-
+  return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-                <Route path="/home" element={<Home />} />
-                
-                <Route path="/home/create" element={<Create />} />
-
-                {/*This one for static routing (debug)*/}v
-                {/*<Route path="/share" element={<Share />}*/}
-
-
-                {/*This one for dynamic routing*/}
-                {/*(Yes, far from pefection, since we need to compare user data with DB)*/}
-                <Route path="/share/:username/:id" element={<Share />} />
-
-                <Route path="/home/edit/:id" element={<Edit />} />
-
-
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/home/create" element={<Create />} />
+        {/*This one for static routing (debug)*/}
+        {/*<Route path="/share" element={<Share />}*/}
+        {/*This one for dynamic routing*/}
+        {/*(Yes, far from pefection, since we need to compare user data with DB)*/}
+        <Route path="/share/:userId" element={<Share />} />
+        <Route path="/home/edit/:id" element={<Edit />} />
       </Routes>
     </BrowserRouter>
   );

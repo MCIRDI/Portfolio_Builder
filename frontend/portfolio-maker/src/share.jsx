@@ -1,86 +1,138 @@
-import { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { AppContext } from "./Context/AppContext";
+import { getUserPublications } from "./services/publications";
 import mainLogo from "./assets/icon-placeholder.svg";
-import "./landing.css";
-import "./home.css";
-
-import { Link, useParams } from "react-router-dom";
-
-
-
-function Publication({ title, image, description }) {
-    return (
-        <div className="publication-block">
-
-
-            <div className="publication-block-top">
-
-                <div className="publication-img">
-                    {/* This is image from data */}
-                    <img src={image} alt="logo"></img>
-                </div>
-                <div className="publication-title">
-                    {/* This is title from data */}
-                    <h3>{title}</h3>
-                </div>
-
-            </div>
-            <div className="publication-block-bottom">
-                <p>{description}</p>
-            </div>
-        </div>);
-
-}
-
-
-
 
 function Share() {
-    const [page, setPage] = useState(0);
-    const { username, id } = useParams(); 
+  const { user } = useContext(AppContext);
+  const { userId } = useParams();
+  const [publications, setPublications] = useState([]);
 
-    console.log(username); 
-    console.log(id);       
+  useEffect(() => {
+    async function fetchPublications() {
+      try {
+        const response = await getUserPublications(userId);
+        setPublications(response);
+      } catch (err) {
+        console.error("Failed to fetch publications:", err);
+      }
+    }
+    fetchPublications();
+  }, [userId]);
 
-    return (
-        <>
-            <header>
-                <div className="header-content">
-                    <div className="logo-block">
-                        <img src={mainLogo} alt="logo"></img>
-                    </div>
-                    <div className="register-section share">
-                        <p>Made with PortfolioMaker</p>
+  const Publication = ({ title, image, description }) => (
+    <div style={styles.publicationBlock}>
+      <div style={styles.publicationTop}>
+        <div style={styles.publicationImg}>
+          <img src={image} alt={title} style={styles.image} />
+        </div>
+        <h3 style={styles.title}>{title}</h3>
+      </div>
+      <p style={styles.description}>{description}</p>
+    </div>
+  );
 
-                    </div>
+  return (
+    <div>
+      <header style={styles.header}>
+        <div style={styles.headerContent}>
+          <div style={styles.logoBlock}>
+            <img src={mainLogo} alt="logo" style={styles.logo} />
+          </div>
+          <p style={styles.tagline}>Made with PortfolioMaker</p>
+          <p>{user ? user.username : "Loading..."}</p>
+        </div>
+      </header>
 
-
-                    <div className="register-section">
-                        {/* Username is needed there */}
-                        <p>USERNAMEPLACEHOLDER</p>
-                    </div>
-                </div>
-            </header>
-
-
-            {/* News page */}
-            <div className="landing-block">
-
-                {/* Publications page */}
-                <div className="landing-block-content active">
-                    {/* Publications are packed in [Publication] function */}
-                    {/* Since some data are closely  attached to DB, [user] field is not used so far, but you can access the content dynamicaly via args*/}
-                    
-                    <Publication title="Title Example" image={mainLogo} description="Aeneas was a robust guy, A kozak full of vim,Full of the devil, lewd and spry, There was no one like him.And when the Greeks had burned down Troy And made of it, to their great joy, A heap of dung, he left that waste Together with some Trojan tramps,The sun-tanned scamps.They all took to their heels in haste. Constructing his boats at great speed, He launched them on the bluish sea And filled them with the men he'd need As he sailed toward his destiny. But Juno, daughter of a bitch, A cackling hen with fighting itch, Loathed him for being proud and deft. She wished to see that his soul would Fly to the deuce for good,And no trace of him would be left." user="test" />
-
-                </div>
-
-
-            </div >
-
-
-
-        </>
-    );
+      <main style={styles.main}>
+        {publications.length > 0 ? (
+          publications.map((pub) => (
+            <Publication
+              key={pub.id}
+              title={pub.name}
+              image={pub.image || mainLogo}
+              description={pub.description}
+            />
+          ))
+        ) : (
+          <p style={styles.noPublications}>No publications yet.</p>
+        )}
+      </main>
+    </div>
+  );
 }
+
+const styles = {
+  header: {
+    backgroundColor: "#fff",
+    padding: "1rem",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+    position: "sticky",
+    top: 0,
+    zIndex: 100,
+  },
+  headerContent: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "0.5rem",
+  },
+  logoBlock: {},
+  logo: {
+    height: "50px",
+    width: "auto",
+  },
+  tagline: {
+    fontStyle: "italic",
+  },
+  main: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1.5rem",
+    padding: "2rem",
+  },
+  publicationBlock: {
+    backgroundColor: "#f9f9f9",
+    borderRadius: "10px",
+    overflow: "hidden",
+    boxShadow: "0 3px 6px rgba(0,0,0,0.1)",
+    display: "flex",
+    flexDirection: "column",
+    transition: "transform 0.2s",
+  },
+  publicationTop: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: "1rem",
+  },
+  publicationImg: {
+    width: "100%",
+    borderRadius: "10px",
+    overflow: "hidden",
+  },
+  image: {
+    width: "100%",
+    maxHeight: "200px",
+    objectFit: "cover",
+  },
+  title: {
+    marginTop: "0.5rem",
+    textAlign: "center",
+    fontSize: "1.2rem",
+  },
+  description: {
+    padding: "1rem",
+    fontSize: "0.95rem",
+    color: "#333",
+  },
+  noPublications: {
+    textAlign: "center",
+    fontSize: "1.2rem",
+    color: "#666",
+  },
+};
 
 export default Share;

@@ -1,11 +1,14 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework.views import APIView  # for custom login view
+from rest_framework.views import APIView
+from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from .serializers import UserSerializer
 
+
+# Registration endpoint
 class RegisterAPI(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -25,7 +28,7 @@ class RegisterAPI(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
-
+# Login endpoint
 class LoginAPI(APIView):
     permission_classes = [permissions.AllowAny]  # public endpoint
 
@@ -41,6 +44,21 @@ class LoginAPI(APIView):
         user = authenticate(username=user.username, password=password)
         if user:
             token, created = Token.objects.get_or_create(user=user)
-            return Response({"token": token.key})
+            user_data = UserSerializer(user).data  # serialize user
+            return Response({
+                "token": token.key,
+                "user": user_data
+            })
         else:
             return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Current authenticated user endpoint
+class CurrentUserAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
