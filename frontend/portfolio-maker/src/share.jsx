@@ -76,18 +76,27 @@ function Share() {
           {user ? user.username : "Loading..."}
         </p>
 
-        {publications.length > 0 ? (
-          publications.map((pub) => (
-            <Publication
-              key={pub.id}
-              title={pub.name}
-              image={pub.image || mainLogo}
-              description={pub.description}
-            />
-          ))
-        ) : (
-          <p style={styles.noPublications}>No publications yet.</p>
-        )}
+        <dev
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1rem",
+          }}
+        >
+          {publications.length > 0 ? (
+            publications.map((pub) => (
+              <Publication
+                key={pub.id}
+                title={pub.name}
+                image={pub.image || mainLogo}
+                description={pub.description}
+              />
+            ))
+          ) : (
+            <p style={styles.noPublications}>No publications yet.</p>
+          )}
+        </dev>
       </main>
     </div>
   );
@@ -134,6 +143,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     transition: "transform 0.2s",
+    width: "75%",
   },
   publicationTop: {
     display: "flex",
