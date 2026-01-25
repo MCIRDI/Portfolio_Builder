@@ -21,6 +21,30 @@ function Share() {
     fetchPublications();
   }, [userId]);
 
+  const handleShare = async () => {
+    const url = window.location.href; // current page URL
+    if (navigator.share) {
+      // Web Share API
+      try {
+        await navigator.share({
+          title: document.title,
+          url,
+        });
+        console.log("Page shared successfully!");
+      } catch (err) {
+        console.error("Error sharing:", err);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(url);
+        alert("URL copied to clipboard!");
+      } catch (err) {
+        console.error("Failed to copy URL:", err);
+      }
+    }
+  };
+
   const Publication = ({ title, image, description }) => (
     <div style={styles.publicationBlock}>
       <div style={styles.publicationTop}>
@@ -41,11 +65,17 @@ function Share() {
             <img src={mainLogo} alt="logo" style={styles.logo} />
           </div>
           <p style={styles.tagline}>Made with PortfolioMaker</p>
-          <p>{user ? user.username : "Loading..."}</p>
+          <button onClick={handleShare} style={styles.shareButton}>
+            Share
+          </button>
         </div>
       </header>
 
       <main style={styles.main}>
+        <p style={{ fontWeight: "bold", fontSize: "30px" }}>
+          {user ? user.username : "Loading..."}
+        </p>
+
         {publications.length > 0 ? (
           publications.map((pub) => (
             <Publication
@@ -85,10 +115,10 @@ const styles = {
     width: "auto",
   },
   tagline: {
-      //fontStyle: "italic",
-      color: "#4c04b8",
-      fontSize: "18px",
-        fontWeight:"700",
+    //fontStyle: "italic",
+    color: "#4c04b8",
+    fontSize: "18px",
+    fontWeight: "700",
   },
   main: {
     display: "flex",
