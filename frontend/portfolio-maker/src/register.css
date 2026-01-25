@@ -123,13 +123,20 @@ main {
         color: black;
         border: #eeebfc;
         font-size: 24px;
+        width: 100%;
     }
 button {
-    margin: 24px auto 0 auto;
+    margin: 20px 10px 30px 10px;
     padding: 10px 20px 10px 20px;
     font-size: 24px;
     font-weight: 700;
     background-color: #4c04b8;
+
+}
+
+form button {
+    margin: 20px 10px 30px 10px;
+    color:white;
 }
 
     button:hover {

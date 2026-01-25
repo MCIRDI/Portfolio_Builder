@@ -18,10 +18,6 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
         <Route path="/home/create" element={<Create />} />
-        {/*This one for static routing (debug)*/}
-        {/*<Route path="/share" element={<Share />}*/}
-        {/*This one for dynamic routing*/}
-        {/*(Yes, far from pefection, since we need to compare user data with DB)*/}
         <Route path="/share/:userId" element={<Share />} />
         <Route path="/home/edit/:id" element={<Edit />} />
       </Routes>

@@ -66,8 +66,8 @@ function Landing() {
                     </div>
 
                     <div className="landing-text-address">
-                        <a href=" /">Explore services today!</a>
-                        <a href=" /" className="landing-arrow">
+                        <a href="/register">Explore services today!</a>
+                        <a href="/register" className="landing-arrow">
                             <svg
                                 width="800px"
                                 height="800px"
@@ -97,8 +97,8 @@ function Landing() {
                     </div>
 
                     <div className="landing-text-address">
-                        <a href=" /">Create account!</a>
-                        <a href=" /" className="landing-arrow">
+                        <a href="/register">Create account!</a>
+                        <a href="/register" className="landing-arrow">
                             <svg
                                 width="800px"
                                 height="800px"
@@ -130,8 +130,8 @@ function Landing() {
                     </div>
 
                     <div className="landing-text-address">
-                        <a href=" /">Start now!</a>
-                        <a href=" /" className="landing-arrow">
+                        <a href="/register">Start now!</a>
+                        <a href="/register" className="landing-arrow">
                             <svg
                                 width="800px"
                                 height="800px"
@@ -161,8 +161,8 @@ function Landing() {
                     </div>
 
                     <div className="landing-text-address">
-                        <a href=" /">Create new portfolio!</a>
-                        <a href=" /" className="landing-arrow">
+                        <a href="/register">Create new portfolio!</a>
+                        <a href="/register" className="landing-arrow">
                             <svg
                                 width="800px"
                                 height="800px"
@@ -195,8 +195,8 @@ function Landing() {
                     </div>
 
                     <div className="landing-text-address">
-                        <a href=" /">Create portfolio</a>
-                        <a href=" /" className="landing-arrow">
+                        <a href="/register">Create portfolio</a>
+                        <a href="/register" className="landing-arrow">
                             <svg
                                 width="800px"
                                 height="800px"
@@ -227,8 +227,8 @@ function Landing() {
                     </div>
 
                     <div className="landing-text-address">
-                        <a href=" /">Create account!</a>
-                        <a href=" /" className="landing-arrow">
+                        <a href="/register">Create account!</a>
+                        <a href="/register" className="landing-arrow">
                             <svg
                                 width="800px"
                                 height="800px"

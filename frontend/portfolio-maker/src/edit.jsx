@@ -1,28 +1,35 @@
-import mainLogo from "./assets/icon-placeholder.svg";
+import mainLogo from "./assets/logo.svg";
 import "./landing.css";
 import "./home.css";
 import "./edit.css";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { updatePublication } from "./services/publications";
+import { AppContext } from "./Context/AppContext";
+import { useContext, useEffect, useState } from "react";
 
 function Edit() {
+    const navigate = useNavigate();
+    const { user } = useContext(AppContext);
   const { id } = useParams();
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const data = new FormData();
+        data.append("name", e.target.title.value);
+        data.append("description", e.target.desc.value);
 
-    const data = new FormData();
-    data.append("name", e.target.title.value);
-    data.append("description", e.target.desc.value);
-    data.append("image", e.target.image.files[0]);
+        if (e.target.image.files[0]) {
+            data.append("image", e.target.image.files[0]);
+        }
 
-    try {
-      await updatePublication(id, data);
-      alert("updated successfully");
-    } catch (err) {
-      console.error(err);
-      alert("Update failed");
-    }
-  };
+        try {
+            await updatePublication(id, data);
+            alert("Updated successfully");
+            navigate("/home");
+        } catch (err) {
+            console.error("Server Error:", err); 
+            
+        }
+    };
 
   return (
     <>
@@ -36,8 +43,7 @@ function Edit() {
           </div>
 
           <div className="register-section">
-            {/* Username is needed there */}
-            <p>USERNAMEPLACEHOLDER</p>
+           <p>{user ? user.username : "Guest"}</p>
           </div>
         </div>
       </header>

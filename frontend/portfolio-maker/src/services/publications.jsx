@@ -47,22 +47,17 @@ export const getUserPublications = async (userId) => {
 };
 
 export const updatePublication = async (id, data) => {
-  try {
-    const response = await axios.put(
-      `${API_URL}/publications/update/${id}/`,
-      data,
-      authHeader(),
-    );
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      throw error.response.data;
-    } else if (error.request) {
-      throw { error: "No response from server" };
-    } else {
-      throw { error: error.message };
+    try {
+        const response = await axios.patch(
+            `${API_URL}/publications/update/${id}/`, 
+            data,
+            authHeader(),
+        );
+        return response.data;
+    } catch (error) {
+        alert("error!")
+        throw error;
     }
-  }
 };
 
 export const deletePublication = (id) => {

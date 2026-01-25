@@ -3,8 +3,10 @@
     "",
     "\\public",
     "\\src",
-    "\\src\\assets"
+    "\\src\\assets",
+    "\\src\\Context",
+    "\\src\\services"
   ],
-  "SelectedNode": "\\src\\assets\\icon-placeholder.svg",
+  "SelectedNode": "\\src\\services\\authentication.jsx",
   "PreviewInSolutionExplorer": false
 }

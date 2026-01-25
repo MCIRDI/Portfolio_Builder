@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "./Context/AppContext";
 import { getUserPublications } from "./services/publications";
-import mainLogo from "./assets/icon-placeholder.svg";
+import mainLogo from "./assets/logo.svg";
 
 function Share() {
   const { user } = useContext(AppContext);
@@ -85,7 +85,10 @@ const styles = {
     width: "auto",
   },
   tagline: {
-    fontStyle: "italic",
+      //fontStyle: "italic",
+      color: "#4c04b8",
+      fontSize: "18px",
+        fontWeight:"700",
   },
   main: {
     display: "flex",
