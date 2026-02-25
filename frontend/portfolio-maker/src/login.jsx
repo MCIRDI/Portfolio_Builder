@@ -1,89 +1,89 @@
 import { useState, useContext } from "react";
-import "./login.css";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "./services/authentication";
 
 import { AppContext } from "./Context/AppContext";
 
 function Login() {
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-    });
-    const { setUser } = useContext(AppContext); 
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const { setSession } = useContext(AppContext);
 
-    const handleSubmit = async(e) => { 
-        e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
 
-        try {
-            const response = await login(formData);
-            setUser(response.user);
-            console.log("Login Success!", response);
-            navigate("/home");
+    try {
+      const response = await login(formData);
+      setSession(response.token, response.user);
+      navigate("/dashboard");
+    } catch (apiError) {
+      setError(apiError.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        } catch (error) {
-            console.error("Authorization error:", error);
-            alert("Login or password is invalid");
-        }
-    };
+  const handleChange = (event) => {
+    setFormData((currentData) => ({
+      ...currentData,
+      [event.target.name]: event.target.value,
+    }));
+  };
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
+  return (
+    <main className="auth-page">
+      <section className="auth-visual">
+        <p className="chip">Welcome back</p>
+        <h1>Log in to your portfolio workspace.</h1>
+        <p>
+          Continue editing projects, refine your narrative, and keep your public profile ready for
+          every opportunity.
+        </p>
+      </section>
 
-    return (
-        <>
-            <main>
-                <div className="left-block"></div>
-                <div className="right-block">
-                    <div className="right-block-content">
-                        <form onSubmit={handleSubmit}>
-                            <div className="form-group">
-                                <h1>Log in</h1>
+      <section className="auth-form-panel">
+        <form onSubmit={handleSubmit} className="auth-form">
+          <h2>Sign in</h2>
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
 
-                                <div className="form-group">
-                                    <label htmlFor="email">Email</label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
 
-                                <div className="form-group">
-                                    <label htmlFor="password">Password</label>
-                                    <input
-                                        type="password"
-                                        id="password"
-                                        name="password"
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                            </div>
+          {error ? <p className="form-error">{error}</p> : null}
 
-                            <button type="submit">Log In</button>
-                        </form>
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? "Signing in..." : "Sign in"}
+          </button>
+        </form>
 
-                        <div className="right-block-content-sign">
-                            <p>Do not have account?</p>
-                            <Link to="/register">
-                                <p>Create account!</p>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </>
-    );
+        <p className="auth-switch">
+          Need an account? <Link to="/register">Create one</Link>
+        </p>
+      </section>
+    </main>
+  );
 }
 
 export default Login;

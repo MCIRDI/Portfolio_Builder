@@ -1,257 +1,96 @@
-import { useState } from "react";
-import mainLogo from "./assets/logo.svg";
-import landing1 from "./assets/image-landing-1.png";
-import landing2 from "./assets/image-landing-2.png";
-import landing3 from "./assets/image-landing-3.png";
-import landing4 from "./assets/image-landing-4.png";
-import landing5 from "./assets/image-landing-5.png";
-import landing6 from "./assets/image-landing-6.png";
-
-import "./landing.css";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AppContext } from "./Context/AppContext";
+
+const features = [
+  {
+    title: "Fast Portfolio Builder",
+    text: "Create and edit project cards in one clean dashboard, with no template lock-in.",
+  },
+  {
+    title: "Share-Ready Pages",
+    text: "Publish instantly with a dedicated public URL you can send to recruiters and clients.",
+  },
+  {
+    title: "Simple Content Workflow",
+    text: "Manage title, image, and story for each project with an editor built for speed.",
+  },
+];
+
+const launchSteps = [
+  "Create your account in under a minute.",
+  "Add projects with strong visuals and concise descriptions.",
+  "Share your public link and keep improving over time.",
+];
 
 function Landing() {
-    const [page, setPage] = useState(0);
-    return (
-        <>
+  const { token } = useContext(AppContext);
 
-            <header>
-                <div className="header-content">
-                    <div className="logo-block">
-                        <img src={mainLogo} alt="logo"></img>
-                    </div>
-                    <div className="landing-menu">
-                        <button
-                            className={page === 0 ? "button-active" : ""}
-                            type="button"
-                            onClick={() => setPage(0)}
-                        >
-                            HOME
-                        </button>
-                        <button
-                            className={page === 1 ? "button-active" : ""}
-                            type="button"
-                            onClick={() => setPage(1)}
-                        >
-                            CONSTRUCTOR
-                        </button>
-                        <button
-                            className={page === 2 ? "button-active" : ""}
-                            type="button"
-                            onClick={() => setPage(2)}
-                        >
-                            PORTFOLIOS
-                        </button>
-                    </div>
-                    <div className="register-section">
-                        <Link to="/register">
-                            <button>Sign in</button>
-                        </Link>
-                    </div>
-                </div>
-            </header>
-            <div className="landing-block">
-                <div className={`landing-block-content ${page === 0 ? "active" : ""}`}>
-                    <div className="landing-text-image">
-                        <div className="landing-text-home">
-                            <h1>Welcome to PortfolioMaker!</h1>
-                            <p>
-                                Looking for apealing portfolio? You are in the right place! We
-                                offer high customization abilities and hosting.
-                            </p>
-                        </div>
-                        <div className="landing-image-home">
-                            <img src={landing1} alt="land1"></img>
-                        </div>
-                    </div>
+  return (
+    <div className="landing-page">
+      <header className="site-header">
+        <div className="brand">
+          <span className="brand-mark" />
+          <div>
+            <h1>Portfolio Forge</h1>
+            <p>Build your best professional story.</p>
+          </div>
+        </div>
+        <nav>
+          <a href="#features">Features</a>
+          <a href="#launch">How it works</a>
+          <Link to={token ? "/dashboard" : "/login"} className="btn btn-secondary">
+            {token ? "Open dashboard" : "Sign in"}
+          </Link>
+        </nav>
+      </header>
 
-                    <div className="landing-text-address">
-                        <a href="/register">Explore services today!</a>
-                        <a href="/register" className="landing-arrow">
-                            <svg
-                                width="800px"
-                                height="800px"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8 10L8 14L6 14L-2.62268e-07 8L6 2L8 2L8 6L16 6L16 10L8 10Z"
-                                    fill="#4c04b8"
-                                />
-                            </svg>
-                        </a>
-                    </div>
+      <main className="landing-main">
+        <section className="hero stagger">
+          <p className="chip">Modern portfolio builder</p>
+          <h2>Turn your projects into a portfolio that feels premium.</h2>
+          <p className="hero-subtitle">
+            Portfolio Forge gives you a production-ready workflow: write, edit, arrange, and
+            publish with a polished interface.
+          </p>
+          <div className="hero-actions">
+            <Link to={token ? "/dashboard/new" : "/register"} className="btn btn-primary">
+              Start building
+            </Link>
+            <Link to={token ? "/dashboard" : "/login"} className="btn btn-text">
+              Explore dashboard
+            </Link>
+          </div>
+        </section>
 
-                    <div className="landing-text-image">
-                        <div className="landing-image-home">
-                            <img src={landing2} alt="land2"></img>
-                        </div>
-                        <div className="landing-text-home">
-                            <h1>Where to start?</h1>
-                            <p>
-                                Firstly create your account. We offer our services only to
-                                registered users.{" "}
-                            </p>
-                        </div>
-                    </div>
+        <section className="feature-grid" id="features">
+          {features.map((feature) => (
+            <article className="feature-card" key={feature.title}>
+              <h3>{feature.title}</h3>
+              <p>{feature.text}</p>
+            </article>
+          ))}
+        </section>
 
-                    <div className="landing-text-address">
-                        <a href="/register">Create account!</a>
-                        <a href="/register" className="landing-arrow">
-                            <svg
-                                width="800px"
-                                height="800px"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8 10L8 14L6 14L-2.62268e-07 8L6 2L8 2L8 6L16 6L16 10L8 10Z"
-                                    fill="#4c04b8"
-                                />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
+        <section className="launch-section" id="launch">
+          <div>
+            <p className="chip">Launch plan</p>
+            <h3>Three steps to a live portfolio</h3>
+          </div>
+          <ol>
+            {launchSteps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </section>
+      </main>
 
-                <div className={`landing-block-content ${page === 1 ? "active" : ""}`}>
-                    <div className="landing-text-image">
-                        <div className="landing-image-home">
-                            <img src={landing3} alt="land3"></img>
-                        </div>
-                        <div className="landing-text-home">
-                            <h1>Easy-to-use constructor!</h1>
-                            <p>
-                                Do not know how to use tool? Don`t worry! Interface of editor
-                                can be handled easily without hundred paged guides!{" "}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="landing-text-address">
-                        <a href="/register">Start now!</a>
-                        <a href="/register" className="landing-arrow">
-                            <svg
-                                width="800px"
-                                height="800px"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8 10L8 14L6 14L-2.62268e-07 8L6 2L8 2L8 6L16 6L16 10L8 10Z"
-                                    fill="#4c04b8"
-                                />
-                            </svg>
-                        </a>
-                    </div>
-
-                    <div className="landing-text-image">
-                        <div className="landing-text-home">
-                            <h1>Wide customization abilities!</h1>
-                            <p>
-                                Tool is provided with many basic templates. The variaty may be
-                                expanded by user templates.
-                            </p>
-                        </div>
-                        <div className="landing-image-home">
-                            <img src={landing4} alt="land4"></img>
-                        </div>
-                    </div>
-
-                    <div className="landing-text-address">
-                        <a href="/register">Create new portfolio!</a>
-                        <a href="/register" className="landing-arrow">
-                            <svg
-                                width="800px"
-                                height="800px"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8 10L8 14L6 14L-2.62268e-07 8L6 2L8 2L8 6L16 6L16 10L8 10Z"
-                                    fill="#4c04b8"
-                                />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-
-                <div className={`landing-block-content ${page === 2 ? "active" : ""}`}>
-                    <div className="landing-text-image">
-                        <div className="landing-text-home">
-                            <h1>Deploy your portfolio on platform!</h1>
-                            <p>
-                                In case you forgot to take portfolio on job interview, you
-                                always can rely on our service! After creation, your portfolio
-                                may be seen by anybody you wish
-                            </p>
-                        </div>
-                        <div className="landing-image-home">
-                            <img src={landing5} alt="landd5"></img>
-                        </div>
-                    </div>
-
-                    <div className="landing-text-address">
-                        <a href="/register">Create portfolio</a>
-                        <a href="/register" className="landing-arrow">
-                            <svg
-                                width="800px"
-                                height="800px"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8 10L8 14L6 14L-2.62268e-07 8L6 2L8 2L8 6L16 6L16 10L8 10Z"
-                                    fill="#4c04b8"
-                                />
-                            </svg>
-                        </a>
-                    </div>
-
-                    <div className="landing-text-image">
-                        <div className="landing-image-home">
-                            <img src={landing6} alt="land6"></img>
-                        </div>
-                        <div className="landing-text-home">
-                            <h1>Privacy</h1>
-                            <p>
-                                If you don`t want to publish your work, than you can download it
-                                or leave on web application. We guarantee security of user
-                                information
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="landing-text-address">
-                        <a href="/register">Create account!</a>
-                        <a href="/register" className="landing-arrow">
-                            <svg
-                                width="800px"
-                                height="800px"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M8 10L8 14L6 14L-2.62268e-07 8L6 2L8 2L8 6L16 6L16 10L8 10Z"
-                                    fill="#4c04b8"
-                                />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <footer>
-                <div className="footer-content">
-                    <p>&copy; 2025 PortfolioMaker. All rights reserved.</p>
-                </div>
-            </footer>
-        </>
-    );
+      <footer className="landing-footer">
+        <p>&copy; 2026 Portfolio Forge</p>
+        <Link to={token ? "/dashboard" : "/register"}>Create your portfolio</Link>
+      </footer>
+    </div>
+  );
 }
 
 export default Landing;

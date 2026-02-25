@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .serializers import UserSerializer
+from .serializers import PublicUserSerializer, UserSerializer
 
 
 # Registration endpoint
@@ -33,13 +33,22 @@ class LoginAPI(APIView):
     permission_classes = [permissions.AllowAny]  # public endpoint
 
     def post(self, request):
-        email = request.data.get("email")
+        email = (request.data.get("email") or "").strip()
         password = request.data.get("password")
 
+        if not email or not password:
+            return Response(
+                {"error": "Email and password are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email__iexact=email)
         except User.DoesNotExist:
-            return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid email or password"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         user = authenticate(username=user.username, password=password)
         if user:
@@ -49,8 +58,11 @@ class LoginAPI(APIView):
                 "token": token.key,
                 "user": user_data
             })
-        else:
-            return Response({"error": "Invalid email or password"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(
+            {"error": "Invalid email or password"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 # Current authenticated user endpoint
@@ -62,3 +74,11 @@ class CurrentUserAPI(APIView):
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+
+class PublicUserAPI(generics.RetrieveAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = PublicUserSerializer
+    queryset = User.objects.all()
+    lookup_field = "id"
+    lookup_url_kwarg = "user_id"

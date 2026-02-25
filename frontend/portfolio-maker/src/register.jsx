@@ -1,114 +1,116 @@
 import { useState, useContext } from "react";
-import "./register.css";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "./services/authentication";
 
 import { AppContext } from "./Context/AppContext";
 
 function Register() {
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-    });
-    const { setUser } = useContext(AppContext);
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            if (formData.password !== formData.confirmPassword) {
-                alert("Passwords do not match!");
-                return;
-            }
-            const response = await register(formData);
-            setUser(response.user);
-            console.log("Form submitted:", formData);
-            navigate("/home");
-        } catch (error) {
-            console.error("Authorization error:", error);
-            alert("Such user already exists");
-        }
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const { setSession } = useContext(AppContext);
 
-    };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
 
-    return (
-        <>
-            <main>
-                <div className="left-block"></div>
-                <div className="right-block">
-                    <div className="right-block-content">
-                        <form onSubmit={handleSubmit}>
-                            <div className="form-group">
-                                <h1>New Account Creation</h1>
-                                <label htmlFor="username">Username</label>
-                                <input
-                                    type="text"
-                                    id="username"
-                                    name="username"
-                                    value={formData.username}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
+    setLoading(true);
+    try {
+      const response = await register(formData);
+      setSession(response.token, response.user);
+      navigate("/dashboard");
+    } catch (apiError) {
+      setError(apiError.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                            <div className="form-group">
-                                <label htmlFor="email">Email</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
+  const handleChange = (event) => {
+    setFormData((currentData) => ({
+      ...currentData,
+      [event.target.name]: event.target.value,
+    }));
+  };
 
-                            <div className="form-group">
-                                <label htmlFor="password">Password</label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
+  return (
+    <main className="auth-page">
+      <section className="auth-visual">
+        <p className="chip">Create your account</p>
+        <h1>Build a portfolio that gets remembered.</h1>
+        <p>
+          Set up your profile and launch a clean, public-ready portfolio URL you can share
+          instantly.
+        </p>
+      </section>
 
-                            <div className="form-group">
-                                <label htmlFor="confirmPassword">Confirm Password</label>
-                                <input
-                                    type="password"
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
+      <section className="auth-form-panel">
+        <form onSubmit={handleSubmit} className="auth-form">
+          <h2>Get started</h2>
+          <label htmlFor="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
 
-                            <button type="submit">Register</button>
-                        </form>
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
 
-                        <div className="right-block-content-sign">
-                            <p>Already have account?</p>
-                            <Link to="/login">
-                                <p>Log in</p>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </>
-    );
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+
+          <label htmlFor="confirmPassword">Confirm password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+
+          {error ? <p className="form-error">{error}</p> : null}
+
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? "Creating..." : "Create account"}
+          </button>
+        </form>
+
+        <p className="auth-switch">
+          Already have an account? <Link to="/login">Sign in</Link>
+        </p>
+      </section>
+    </main>
+  );
 }
 
 export default Register;

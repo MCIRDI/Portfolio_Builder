@@ -1,89 +1,200 @@
-import mainLogo from "./assets/logo.svg";
-import "./landing.css";
-import "./home.css";
-import "./edit.css";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { updatePublication } from "./services/publications";
-import { AppContext } from "./Context/AppContext";
-import { useContext, useEffect, useState } from "react";
+import { getPublication, updatePublication } from "./services/publications";
+import { useEffect, useState } from "react";
 
 function Edit() {
-    const navigate = useNavigate();
-    const { user } = useContext(AppContext);
+  const navigate = useNavigate();
   const { id } = useParams();
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const data = new FormData();
-        data.append("name", e.target.title.value);
-        data.append("description", e.target.desc.value);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    role: "",
+    technologiesText: "",
+    mediaLinksText: "",
+    image: null,
+  });
+  const [existingImage, setExistingImage] = useState("");
 
-        if (e.target.image.files[0]) {
-            data.append("image", e.target.image.files[0]);
-        }
+  useEffect(() => {
+    async function loadPublication() {
+      setLoading(true);
+      setError("");
+      try {
+        const publication = await getPublication(id);
+        setFormData({
+          name: publication.name || "",
+          description: publication.description || "",
+          role: publication.role || "",
+          technologiesText: Array.isArray(publication.technologies)
+            ? publication.technologies.join(", ")
+            : "",
+          mediaLinksText: Array.isArray(publication.media_links)
+            ? publication.media_links.join("\n")
+            : "",
+          image: null,
+        });
+        setExistingImage(publication.image || "");
+      } catch (apiError) {
+        setError(apiError.message);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-        try {
-            await updatePublication(id, data);
-            alert("Updated successfully");
-            navigate("/home");
-        } catch (err) {
-            console.error("Server Error:", err); 
-            
-        }
-    };
+    loadPublication();
+  }, [id]);
+
+  const handleInputChange = (event) => {
+    setFormData((currentData) => ({
+      ...currentData,
+      [event.target.name]: event.target.value,
+    }));
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0] || null;
+    setFormData((currentData) => ({
+      ...currentData,
+      image: file,
+    }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setSaving(true);
+
+    const payload = new FormData();
+    payload.append("name", formData.name);
+    payload.append("description", formData.description);
+    payload.append("role", formData.role);
+    payload.append(
+      "technologies",
+      JSON.stringify(
+        formData.technologiesText
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean),
+      ),
+    );
+    payload.append(
+      "media_links",
+      JSON.stringify(
+        formData.mediaLinksText
+          .split("\n")
+          .map((item) => item.trim())
+          .filter(Boolean),
+      ),
+    );
+    if (formData.image) {
+      payload.append("image", formData.image);
+    }
+
+    try {
+      await updatePublication(id, payload);
+      navigate("/dashboard");
+    } catch (apiError) {
+      setError(apiError.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <main className="editor-page">
+        <section className="editor-shell">
+          <p className="state-message">Loading project...</p>
+        </section>
+      </main>
+    );
+  }
 
   return (
-    <>
-      <header>
-        <div className="header-content">
-          <div className="logo-block">
-            <img src={mainLogo} alt="logo"></img>
+    <main className="editor-page">
+      <section className="editor-shell">
+        <div className="section-heading">
+          <div>
+            <p className="chip">Edit project</p>
+            <h1>Refine your portfolio entry</h1>
           </div>
-          <div className="register-section share">
-            <p>Made with PortfolioMaker</p>
-          </div>
-
-          <div className="register-section">
-           <p>{user ? user.username : "Guest"}</p>
-          </div>
+          <Link to="/dashboard" className="btn btn-text">
+            Back to dashboard
+          </Link>
         </div>
-      </header>
 
-      <div className="landing-block">
-        <div className="landing-block-content active">
-          <div className="publication-block">
-            <form onSubmit={handleSubmit}>
-              <label for="title">Title</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                placeholder="Enter title"
-              />
+        <form className="editor-form" onSubmit={handleSubmit}>
+          <label htmlFor="name">Project title</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            required
+          />
 
-              <label for="image">Image</label>
-              <input type="file" id="image" name="image" accept="image/*" />
+          <label htmlFor="image">Replace image (optional)</label>
+          <input type="file" id="image" name="image" accept="image/*" onChange={handleImageChange} />
 
-              <label for="desc">Description</label>
-              <textarea
-                id="desc"
-                name="desc"
-                rows="5"
-                placeholder="Enter description"
-              ></textarea>
+          {existingImage ? (
+            <img src={existingImage} alt={formData.name || "Current project"} className="editor-preview" />
+          ) : null}
 
-              <div className="publication-button-section">
-                <button className="green" type="submit">
-                  Apply
-                </button>
-                <Link to="/home">
-                  <button className="red">Return</button>
-                </Link>
-              </div>
-            </form>
+          <label htmlFor="description">Project description</label>
+          <textarea
+            id="description"
+            name="description"
+            rows="8"
+            value={formData.description}
+            onChange={handleInputChange}
+            required
+          />
+
+          <label htmlFor="role">Your role</label>
+          <input
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleInputChange}
+            placeholder="Your role in this project"
+          />
+
+          <label htmlFor="technologiesText">Technologies / tools (comma-separated)</label>
+          <input
+            id="technologiesText"
+            name="technologiesText"
+            value={formData.technologiesText}
+            onChange={handleInputChange}
+            placeholder="React, Django, Figma"
+          />
+
+          <label htmlFor="mediaLinksText">Media links (one URL per line)</label>
+          <textarea
+            id="mediaLinksText"
+            name="mediaLinksText"
+            rows="4"
+            value={formData.mediaLinksText}
+            onChange={handleInputChange}
+            placeholder="https://demo.example.com"
+          />
+
+          {error ? <p className="form-error">{error}</p> : null}
+
+          <div className="editor-actions">
+            <button className="btn btn-primary" type="submit" disabled={saving}>
+              {saving ? "Saving..." : "Save changes"}
+            </button>
+            <Link to="/dashboard" className="btn btn-secondary">
+              Cancel
+            </Link>
           </div>
-        </div>
-      </div>
-    </>
+        </form>
+      </section>
+    </main>
   );
 }
 

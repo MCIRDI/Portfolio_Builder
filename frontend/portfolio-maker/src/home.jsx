@@ -1,256 +1,237 @@
-import { useContext, useEffect, useState } from "react";
-import mainLogo from "./assets/logo.svg";
-import "./landing.css";
-import "./home.css";
-import { Link, useNavigate } from "react-router-dom";
-import {
-    deletePublication,
-    getUserPublications,
-} from "./services/publications";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import iconPlaceholder from "./assets/icon-placeholder.svg";
 import { AppContext } from "./Context/AppContext";
-
-function Publication() {
-    const { user } = useContext(AppContext);
-    const [publications, setPublications] = useState([]);
-
-    useEffect(() => {
-        const fetchPublications = async () => {
-            console.log("Current user in context:", user);
-            if (user?.id) {
-                const data = await getUserPublications(user.id);
-                setPublications(data);
-            }
-        };
-        fetchPublications();
-    }, [user]);
-
-    const handleDelete = async (id) => {
-        await deletePublication(id);
-        setPublications((prev) => prev.filter((p) => p.id !== id));
-    };
-
-    return (
-        <>
-            {publications.map((pub) => (
-                <div
-                    key={pub.id}
-                    style={{
-                        background: "#eaeaea",
-                        borderRadius: "14px",
-                        padding: "16px",
-                        marginBottom: "16px",
-                        width: "100%",
-                        maxWidth: "700px",
-                        boxShadow: "0 6px 18px rgba(0,0,0,0.35)",
-                    }}
-                >
-                    {/* TOP */}
-                    <div
-                        style={{
-                            display: "flex",
-                            gap: "14px",
-                            alignItems: "center",
-                        }}
-                    >
-                        {/* IMAGE */}
-                        <div
-                            style={{
-                                width: "80px",
-                                height: "80px",
-                                borderRadius: "10px",
-                                overflow: "hidden",
-                                background: "#222",
-                                flexShrink: 0,
-                            }}
-                        >
-                            <img
-                                src={pub.image}
-                                alt="logo"
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                }}
-                            />
-                        </div>
-
-                        {/* TITLE + BUTTONS */}
-                        <div
-                            style={{
-                                flex: 1,
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                gap: "10px",
-                            }}
-                        >
-                            <h3 style={{ margin: 0, color: "#000000", fontSize: "1.1rem" }}>
-                                {pub.name}
-                            </h3>
-
-                            <div style={{ display: "flex", gap: "8px" }}>
-                                <Link to={`/home/edit/${pub.id}`}>
-                                <button
-                                    style={{
-                                        background: "#2d6cdf",
-                                        border: "none",
-                                        borderRadius: "8px",
-                                        padding: "6px 12px",
-                                        color: "#fff",
-                                        cursor: "pointer",
-                                        fontSize: "0.85rem",
-                                    }}
-                                >
-                                    Edit
-                                </button>
-                                    </Link>
-                                <button
-                                    onClick={() => handleDelete(pub.id)}
-                                    style={{
-                                        background: "#d64545",
-                                        border: "none",
-                                        borderRadius: "8px",
-                                        padding: "6px 12px",
-                                        color: "#fff",
-                                        cursor: "pointer",
-                                        fontSize: "0.85rem",
-                                    }}
-                                >
-                                    Remove
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* DESCRIPTION */}
-                    <div style={{ marginTop: "10px" }}>
-                        <p
-                            style={{
-                                margin: 0,
-                                color: "#000000",
-                                fontSize: "0.9rem",
-                                lineHeight: 1.4,
-                            }}
-                        >
-                            {pub.description}
-                        </p>
-                    </div>
-                </div>
-            ))}
-        </>
-    );
-}
-
-function News({ title, image, description }) {
-    return (
-        <div className="publication-block">
-            <div className="publication-block-top news-top">
-                <div className="publication-img">
-                    <img src={image} alt="logo"></img>
-                </div>
-
-                <div className="publication-title">
-                    <h3>{title}</h3>
-                </div>
-            </div>
-            <div className="publication-block-bottom">
-                <p>{description}</p>
-            </div>
-        </div>
-    );
-}
+import { deletePublication, getMyProfile, getMyPublications } from "./services/publications";
 
 function Home() {
-    const { user } = useContext(AppContext);
+  const { user, logout } = useContext(AppContext);
+  const [publications, setPublications] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
-    const [page, setPage] = useState(0);
-    const navigate = useNavigate();
+  const refreshPublications = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
-    const shareUrl = `/share/${user?.id}`;
+    try {
+      const items = await getMyPublications();
+      setPublications(items);
+    } catch (apiError) {
+      setError(apiError.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    const copyShareLink = () => {
-        const fullUrl = `${window.location.origin}${shareUrl}`;
-        navigator.clipboard.writeText(fullUrl);
-        navigate(shareUrl);
-    };
+  useEffect(() => {
+    refreshPublications();
+  }, [refreshPublications]);
 
-    return (
-        <>
-            <header>
-                <div className="header-content">
-                    <div className="logo-block">
-                        <img src={mainLogo} alt="logo"></img>
+  useEffect(() => {
+    async function loadProfile() {
+      setProfileLoading(true);
+      try {
+        const data = await getMyProfile();
+        setProfile(data);
+      } catch (apiError) {
+        setError(apiError.message);
+      } finally {
+        setProfileLoading(false);
+      }
+    }
+
+    loadProfile();
+  }, []);
+
+  const totalWords = useMemo(
+    () =>
+      publications.reduce((counter, publication) => {
+        const words = publication.description?.trim().split(/\s+/).filter(Boolean) || [];
+        return counter + words.length;
+      }, 0),
+    [publications],
+  );
+
+  const handleDelete = async (id) => {
+    const shouldDelete = window.confirm("Delete this project from your portfolio?");
+    if (!shouldDelete) {
+      return;
+    }
+
+    try {
+      await deletePublication(id);
+      setPublications((currentItems) => currentItems.filter((item) => item.id !== id));
+      setNotice("Project removed successfully.");
+    } catch (apiError) {
+      setError(apiError.message);
+    }
+  };
+
+  const handleCopyPortfolioLink = async () => {
+    if (!user?.id) {
+      return;
+    }
+
+    const link = `${window.location.origin}/portfolio/${user.id}`;
+
+    try {
+      await navigator.clipboard.writeText(link);
+      setNotice("Portfolio link copied to clipboard.");
+    } catch {
+      setError("Clipboard permission is blocked in this browser.");
+    }
+  };
+
+  const profileCompletionCount = useMemo(() => {
+    if (!profile) {
+      return 0;
+    }
+
+    const checks = [
+      Boolean(profile.full_name),
+      Boolean(profile.summary),
+      Array.isArray(profile.work_experience) && profile.work_experience.length > 0,
+      Array.isArray(profile.education) && profile.education.length > 0,
+      Array.isArray(profile.technical_skills) && profile.technical_skills.length > 0,
+      Array.isArray(profile.achievements) && profile.achievements.length > 0,
+      Array.isArray(profile.testimonials) && profile.testimonials.length > 0,
+      Boolean(profile.professional_philosophy || profile.career_objectives),
+      Array.isArray(profile.hobbies) && profile.hobbies.length > 0,
+    ];
+
+    return checks.filter(Boolean).length;
+  }, [profile]);
+
+  return (
+    <div className="dashboard-page">
+      <header className="dashboard-header">
+        <div>
+          <p className="chip">Workspace</p>
+          <h1>{user?.username}'s Portfolio</h1>
+        </div>
+        <div className="dashboard-actions">
+          <button className="btn btn-secondary" type="button" onClick={handleCopyPortfolioLink}>
+            Copy public link
+          </button>
+          <Link to={`/portfolio/${user?.id}`} className="btn btn-text">
+            Preview public page
+          </Link>
+          <button className="btn btn-text" type="button" onClick={logout}>
+            Log out
+          </button>
+        </div>
+      </header>
+
+      <section className="dashboard-stats">
+        <article>
+          <h2>{publications.length}</h2>
+          <p>Projects published</p>
+        </article>
+        <article>
+          <h2>{totalWords}</h2>
+          <p>Words in portfolio stories</p>
+        </article>
+        <article>
+          <h2>{profile?.full_name || user?.username || "Profile"}</h2>
+          <p>Portfolio owner</p>
+        </article>
+      </section>
+
+      <section className="dashboard-list">
+        <div className="section-heading">
+          <div>
+            <h2>Portfolio profile</h2>
+            <p>
+              Fill personal info, resume details, goals, testimonials, achievements, and hobbies.
+            </p>
+          </div>
+          <Link to="/dashboard/profile" className="btn btn-primary">
+            Edit profile sections
+          </Link>
+        </div>
+
+        {profileLoading ? <p className="state-message">Loading profile sections...</p> : null}
+
+        {!profileLoading ? (
+          <div className="profile-quick-card">
+            <p>{profileCompletionCount}/9 profile sections completed</p>
+            <h3>{profile?.summary || "Add a short professional summary to strengthen your page."}</h3>
+          </div>
+        ) : null}
+      </section>
+
+      <section className="dashboard-list">
+        <div className="section-heading">
+          <div>
+            <h2>Your projects</h2>
+            <p>Keep each project concise, visual, and outcome-focused.</p>
+          </div>
+          <Link to="/dashboard/new" className="btn btn-primary">
+            Add project
+          </Link>
+        </div>
+
+        {notice ? <p className="form-success">{notice}</p> : null}
+        {error ? <p className="form-error">{error}</p> : null}
+
+        {loading ? <p className="state-message">Loading projects...</p> : null}
+
+        {!loading && publications.length === 0 ? (
+          <div className="empty-state">
+            <h3>No projects yet</h3>
+            <p>Add your first project to generate a share-ready portfolio URL.</p>
+            <Link to="/dashboard/new" className="btn btn-primary">
+              Create first project
+            </Link>
+          </div>
+        ) : null}
+
+        {!loading && publications.length > 0 ? (
+          <div className="project-grid">
+            {publications.map((publication) => (
+              <article className="project-card" key={publication.id}>
+                <img
+                  src={publication.image || iconPlaceholder}
+                  alt={publication.name}
+                  className="project-thumb"
+                />
+                <div className="project-content">
+                  <h3>{publication.name}</h3>
+                  <p>{publication.description}</p>
+                  {publication.role ? <p className="muted-line">Role: {publication.role}</p> : null}
+                  {Array.isArray(publication.technologies) && publication.technologies.length > 0 ? (
+                    <div className="tag-list">
+                      {publication.technologies.map((tool) => (
+                        <span key={`${publication.id}-${tool}`} className="tag">
+                          {tool}
+                        </span>
+                      ))}
                     </div>
-                    <div className="landing-menu">
-                        <button
-                            className={page === 0 ? "button-active" : ""}
-                            type="button"
-                            onClick={() => setPage(0)}
-                        >
-                            NEWS
-                        </button>
-                        <button
-                            className={page === 1 ? "button-active" : ""}
-                            type="button"
-                            onClick={() => setPage(1)}
-                        >
-                            PORTFOLIOS
-                        </button>
-                    </div>
-                    <div className="register-section share">
-                        <button onClick={copyShareLink}>SHARE</button>
-                    </div>
-
-                    <div className="register-section">
-                        <p>{user ? user.username : "Guest"}</p>
-                        <Link to="/">
-                            <svg
-                                width="20px"
-                                height="20px"
-                                viewBox="0 0 1024 1024"
-                                className="icon"
-                                version="1.1"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path
-                                    d="M730.56 928h-640v-288a32 32 0 1 0-64 0v320a32 32 0 0 0 32 32h672a32 32 0 0 0 0-64zM58.56 544a32 32 0 0 0 32-32v-128a32 32 0 1 0-64 0v128a32 32 0 0 0 32 32zM46.4 285.44a32 32 0 0 0 12.16 2.56 32 32 0 0 0 12.16-2.56 29.76 29.76 0 0 0 10.56-6.72 32 32 0 0 0 6.72-34.88 29.76 29.76 0 0 0-6.72-10.56 32 32 0 0 0-10.56-6.72A32 32 0 0 0 58.56 224a32 32 0 0 0-22.72 54.72 37.12 37.12 0 0 0 10.56 6.72zM58.56 160a32 32 0 0 0 32-32V96h640a32 32 0 0 0 0-64h-672a32 32 0 0 0-32 32v64a32 32 0 0 0 32 32zM984.32 524.16a32 32 0 0 0-7.04-34.88l-224-224a32 32 0 0 0-45.12 45.12l169.28 169.6H314.56a32 32 0 1 0 0 64h562.88l-169.28 169.28a32 32 0 1 0 45.12 45.12l224-224a32 32 0 0 0 7.04-10.24z"
-                                    fill="#231815"
-                                />
-                            </svg>
-                        </Link>
-                    </div>
+                  ) : null}
                 </div>
-            </header>
-
-            {/* News page */}
-            <div className="landing-block">
-                <div className={`landing-block-content ${page === 0 ? "active" : ""}`}>
-                    <News
-                        title="Initial release"
-                        image={mainLogo}
-                        description="Today is the official launch! Our mission is to simplify the path from an idea to a ready-made portfolio site. Initial release includes a basic set of templates and a convenient editor to make your first step in your career as stylish as possible. Try it right now!"
-                    />
+                <div className="project-actions">
+                  <Link to={`/dashboard/edit/${publication.id}`} className="btn btn-secondary">
+                    Edit
+                  </Link>
+                  <button
+                    className="btn btn-danger"
+                    type="button"
+                    onClick={() => handleDelete(publication.id)}
+                  >
+                    Delete
+                  </button>
                 </div>
-
-                {/* Publications page */}
-                <div className={`landing-block-content ${page === 1 ? "active" : ""}`}>
-                    <Link to="/home/create">
-                        <div className="add-publication">
-                            <p>+</p>
-                        </div>
-                    </Link>
-                    {/* Publications are packed in [Publication] function */}
-                    {/* Since some data are closely  attached to DB, [user] field is not used so far, but you can access the content dynamicaly via args*/}
-                    <Publication
-                        title="Title Example"
-                        image={mainLogo}
-                        description="Aeneas was a robust guy, A kozak full of vim,Full of the devil, lewd and spry, There was no one like him.And when the Greeks had burned down Troy And made of it, to their great joy, A heap of dung, he left that waste Together with some Trojan tramps,The sun-tanned scamps.They all took to their heels in haste. Constructing his boats at great speed, He launched them on the bluish sea And filled them with the men he'd need As he sailed toward his destiny. But Juno, daughter of a bitch, A cackling hen with fighting itch, Loathed him for being proud and deft. She wished to see that his soul would Fly to the deuce for good,And no trace of him would be left."
-                        user="test"
-                    />
-                </div>
-            </div>
-        </>
-    );
+              </article>
+            ))}
+          </div>
+        ) : null}
+      </section>
+    </div>
+  );
 }
 
 export default Home;
