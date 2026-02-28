@@ -28,12 +28,14 @@ if not DEBUG and SECRET_KEY == "django-insecure-local-dev-key-change-me-in-produ
 
 ALLOWED_HOSTS = get_list_env(
     "ALLOWED_HOSTS",
-    default="127.0.0.1,localhost",
+    default="127.0.0.1,localhost,.onrender.com",
 )
 if IS_RENDER:
     render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME")
     if render_hostname:
         ALLOWED_HOSTS.append(render_hostname)
+# Add all possible hosts for debugging
+ALLOWED_HOSTS.extend(["portfolio-backend.onrender.com", "*"])
 ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
 
 

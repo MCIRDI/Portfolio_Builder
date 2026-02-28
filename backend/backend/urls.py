@@ -22,7 +22,14 @@ from django.http import JsonResponse
 
 
 def health_check(_request):
-    return JsonResponse({"status": "ok"})
+    import os
+    debug_info = {
+        "status": "ok",
+        "debug": os.getenv("DEBUG", "not set"),
+        "allowed_hosts": os.getenv("ALLOWED_HOSTS", "not set"),
+        "cors_all_origins": os.getenv("CORS_ALLOW_ALL_ORIGINS", "not set"),
+    }
+    return JsonResponse(debug_info)
 
 urlpatterns = [
     path("", health_check, name="health-check"),
