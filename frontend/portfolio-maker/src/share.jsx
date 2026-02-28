@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getPublicUser, getPublications } from "./services/publications";
+import { getPublicProfile, getUserPublications } from "./services/publications";
 import { getMediaUrl } from "./utils/helpers";
 import iconPlaceholder from "./assets/icon-placeholder.svg";
 
