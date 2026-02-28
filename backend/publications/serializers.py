@@ -63,6 +63,11 @@ class PortfolioProfileSerializer(JSONListParsingMixin, serializers.ModelSerializ
         required=False,
         allow_null=True,
     )
+    cv = serializers.FileField(
+        use_url=True,
+        required=False,
+        allow_null=True,
+    )
     user_id = serializers.IntegerField(source="user.id", read_only=True)
     username = serializers.CharField(source="user.username", read_only=True)
 
@@ -95,6 +100,7 @@ class PortfolioProfileSerializer(JSONListParsingMixin, serializers.ModelSerializ
             "username",
             "full_name",
             "photo",
+            "cv",
             "contact_email",
             "phone",
             "location",

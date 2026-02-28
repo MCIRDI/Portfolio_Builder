@@ -1,16 +1,31 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getPublicProfile, getUserPublications } from "./services/publications";
 import { getMediaUrl } from "./utils/helpers";
 import iconPlaceholder from "./assets/icon-placeholder.svg";
 
-function SectionList({ id, title, subtitle, items, renderItem }) {
+function SectionList({ id, title, subtitle, items, renderItem, onVisible }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!onVisible || !ref.current) return;
+    const el = ref.current;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) onVisible(id);
+      },
+      { threshold: 0.3, rootMargin: "-80px 0px -30% 0px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [id, onVisible]);
+
   if (!Array.isArray(items) || items.length === 0) {
     return null;
   }
 
   return (
-    <section className="pf-section" id={id}>
+    <section className="pf-section pf-section-animate" id={id} ref={ref}>
       <h2 className="pf-section-title">{title}</h2>
       {subtitle ? <p className="pf-section-subtitle">{subtitle}</p> : null}
       <div className="pf-list">{items.map(renderItem)}</div>
@@ -24,6 +39,8 @@ function Share() {
   const [publications, setPublications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeSection, setActiveSection] = useState("hero");
+  const sectionRefs = useRef({});
 
   useEffect(() => {
     async function fetchPublicPortfolio() {
@@ -72,6 +89,112 @@ function Share() {
 
   const displayName = profile?.full_name || profile?.username || "Portfolio Owner";
   const headline = profile?.summary?.split(".")[0] || "I build things that matter.";
+  const cvUrl = profile?.cv ? getMediaUrl(profile.cv) : null;
+
+  const hasWorkExp =
+    Array.isArray(profile?.work_experience) &&
+    profile.work_experience.some(
+      (i) => i && Object.values(i || {}).some((v) => v && String(v).trim()),
+    );
+  const hasEducation =
+    Array.isArray(profile?.education) &&
+    profile.education.some(
+      (i) => i && Object.values(i || {}).some((v) => v && String(v).trim()),
+    );
+  const hasSkills =
+    (Array.isArray(profile?.technical_skills) && profile.technical_skills.length > 0) ||
+    (Array.isArray(profile?.soft_skills) && profile.soft_skills.length > 0);
+  const hasAchievements =
+    Array.isArray(profile?.achievements) && profile.achievements.length > 0;
+  const hasCertifications =
+    Array.isArray(profile?.certifications) && profile.certifications.length > 0;
+  const hasTestimonials =
+    Array.isArray(profile?.testimonials) && profile.testimonials.length > 0;
+  const hasGoals =
+    Boolean(profile?.professional_philosophy?.trim()) ||
+    Boolean(profile?.career_objectives?.trim());
+  const hasHobbies =
+    Array.isArray(profile?.hobbies) && profile.hobbies.length > 0;
+
+  const navSections = useMemo(() => {
+    const s = [];
+    if (publications.length > 0) s.push({ id: "projects", label: "Projects" });
+    if (hasSkills) s.push({ id: "tech", label: "Tech Stack" });
+    if (profile?.summary) s.push({ id: "about", label: "About" });
+    if (hasWorkExp) s.push({ id: "experience", label: "Experience" });
+    if (hasEducation) s.push({ id: "education", label: "Education" });
+    if (hasAchievements) s.push({ id: "achievements", label: "Achievements" });
+    if (hasCertifications) s.push({ id: "certifications", label: "Certifications" });
+    if (hasTestimonials) s.push({ id: "testimonials", label: "Testimonials" });
+    if (hasGoals) s.push({ id: "goals", label: "Goals" });
+    if (hasHobbies) s.push({ id: "hobbies", label: "Hobbies" });
+    s.push({ id: "contact", label: "Contact" });
+    return s;
+  }, [
+    publications.length,
+    hasSkills,
+    profile?.summary,
+    hasWorkExp,
+    hasEducation,
+    hasAchievements,
+    hasCertifications,
+    hasTestimonials,
+    hasGoals,
+    hasHobbies,
+  ]);
+
+  const workItems = useMemo(
+    () =>
+      (Array.isArray(profile?.work_experience) ? profile.work_experience : []).filter(
+        (i) => i && Object.values(i || {}).some((v) => v && String(v).trim()),
+      ),
+    [profile?.work_experience],
+  );
+  const eduItems = useMemo(
+    () =>
+      (Array.isArray(profile?.education) ? profile.education : []).filter(
+        (i) => i && Object.values(i || {}).some((v) => v && String(v).trim()),
+      ),
+    [profile?.education],
+  );
+
+  const onSectionVisible = (id) => setActiveSection(id);
+
+  useEffect(() => {
+    if (loading || !profile) return;
+    const ids = ["hero", ...navSections.map((s) => s.id)];
+    const observers = [];
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) setActiveSection(id);
+        },
+        { threshold: 0.2, rootMargin: "-100px 0px -40% 0px" },
+      );
+      obs.observe(el);
+      observers.push(() => obs.disconnect());
+    });
+    return () => observers.forEach((fn) => fn());
+  }, [loading, profile, navSections]);
+
+  useEffect(() => {
+    if (loading || !profile) return;
+    const sections = document.querySelectorAll(".pf-section-animate");
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "-50px 0px -80px 0px" },
+    );
+    sections.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [loading, profile, publications.length]);
 
   if (loading) {
     return (
@@ -86,54 +209,92 @@ function Share() {
 
   return (
     <main className="pf-page">
-      <nav className="pf-nav">
-        <Link to="/" className="pf-nav-brand">
-          Portfolio Forge
-        </Link>
-        <div className="pf-nav-links">
-          <a href="#projects">Projects</a>
-          <a href="#experience">Experience</a>
-          <a href="#contact">Contact</a>
-          <button className="pf-btn pf-btn-outline" type="button" onClick={handleShare}>
-            Share page
-          </button>
+      <div className="pf-progress-track">
+        <div className="pf-progress-line">
+          <div
+            className={`pf-progress-dot ${activeSection === "hero" ? "active" : ""}`}
+            onClick={() => document.getElementById("hero")?.scrollIntoView({ behavior: "smooth" })}
+          />
+          {navSections.map(({ id }) => (
+            <div
+              key={id}
+              className={`pf-progress-dot ${activeSection === id ? "active" : ""}`}
+              onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })}
+            />
+          ))}
         </div>
-      </nav>
+      </div>
+
+      <div className="pf-hero-bg">
+        <nav className="pf-nav">
+          <Link to="/" className="pf-nav-brand">
+            Portfolio Forge
+          </Link>
+          <div className="pf-nav-links">
+            {navSections.map(({ id, label }) => (
+              <a key={id} href={`#${id}`}>
+                {label}
+              </a>
+            ))}
+            <button className="pf-btn pf-btn-outline" type="button" onClick={handleShare}>
+              Share page
+            </button>
+          </div>
+        </nav>
+
+        <div className="pf-content pf-hero-zone">
+          {error ? <div className="pf-error">{error}</div> : null}
+
+          <header className="pf-hero" id="hero">
+            <div className="pf-hero-inner">
+              <p className="pf-hero-greeting">👋 Hey, I&apos;m {displayName.split(" ")[0]}.</p>
+              <h1 className="pf-hero-title">{headline}</h1>
+              <div className="pf-hero-actions">
+                <a
+                  href={
+                    hasWorkExp
+                      ? "#experience"
+                      : hasEducation
+                        ? "#education"
+                        : profile?.summary
+                          ? "#about"
+                          : "#contact"
+                  }
+                  className="pf-btn pf-btn-primary"
+                >
+                  More about me
+                </a>
+                {cvUrl ? (
+                  <a
+                    href={cvUrl}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="pf-btn pf-btn-outline"
+                  >
+                    Download my CV
+                  </a>
+                ) : null}
+              </div>
+            </div>
+            {profile?.photo ? (
+              <div className="pf-hero-photo">
+                <img src={getMediaUrl(profile.photo)} alt={displayName} />
+              </div>
+            ) : null}
+          </header>
+        </div>
+      </div>
 
       <div className="pf-content">
-        {error ? (
-          <div className="pf-error">
-            {error}
-          </div>
-        ) : null}
-
-        <header className="pf-hero">
-          <div className="pf-hero-inner">
-            <p className="pf-hero-greeting">👋 Hey, I&apos;m {displayName.split(" ")[0]}.</p>
-            <h1 className="pf-hero-title">{headline}</h1>
-            <div className="pf-hero-actions">
-              <a href="#experience" className="pf-btn pf-btn-primary">
-                More about me
-              </a>
-              {(profile?.contact_email || profile?.phone) ? (
-                <a
-                  href={profile?.contact_email ? `mailto:${profile.contact_email}` : `tel:${profile?.phone}`}
-                  className="pf-btn pf-btn-outline"
-                >
-                  Get in touch
-                </a>
-              ) : null}
-            </div>
-          </div>
-          {profile?.photo ? (
-            <div className="pf-hero-photo">
-              <img src={getMediaUrl(profile.photo)} alt={displayName} />
-            </div>
-          ) : null}
-        </header>
-
         {publications.length > 0 ? (
-          <section className="pf-section" id="projects">
+          <section
+            className="pf-section pf-section-animate"
+            id="projects"
+            ref={(el) => {
+              sectionRefs.current.projects = el;
+            }}
+          >
             <h2 className="pf-section-title">Featured Projects</h2>
             <p className="pf-section-subtitle">
               A selection of projects I&apos;ve worked on.
@@ -187,9 +348,8 @@ function Share() {
           </section>
         ) : null}
 
-        {(Array.isArray(profile?.technical_skills) && profile.technical_skills.length > 0) ||
-        (Array.isArray(profile?.soft_skills) && profile.soft_skills.length > 0) ? (
-          <section className="pf-section">
+        {hasSkills ? (
+          <section className="pf-section pf-section-animate" id="tech">
             <h2 className="pf-section-title">My Tech Stack</h2>
             <p className="pf-section-subtitle">
               Technologies and tools I work with.
@@ -214,50 +374,62 @@ function Share() {
         ) : null}
 
         {profile?.summary ? (
-          <section className="pf-section">
+          <section className="pf-section pf-section-animate" id="about">
             <h2 className="pf-section-title">About me</h2>
             <p className="pf-about-text">{profile.summary}</p>
           </section>
         ) : null}
 
-        <SectionList
-          id="experience"
-          title="Experience & Education"
-          subtitle="My professional journey."
-          items={[
-            ...(Array.isArray(profile?.work_experience) ? profile.work_experience : []),
-            ...(Array.isArray(profile?.education) ? profile.education : []),
-          ].filter(
-            (item) =>
-              item &&
-              typeof item === "object" &&
-              Object.values(item).some((v) => v && String(v).trim()),
-          )}
-          renderItem={(item, index) => {
-            const isEdu = "degree" in item && item.degree;
-            return (
-              <article className="pf-timeline-item" key={`item-${index}`}>
+        {workItems.length > 0 ? (
+          <SectionList
+            id="experience"
+            title="Experience"
+            subtitle="My professional journey."
+            items={workItems}
+            onVisible={onSectionVisible}
+            renderItem={(item, index) => (
+              <article className="pf-timeline-item" key={`work-${index}`}>
                 <div className="pf-timeline-dot" />
                 <div className="pf-timeline-content">
-                  <h3>{isEdu ? item.degree : item.job_title}</h3>
+                  <h3>{item.job_title}</h3>
                   <p className="pf-timeline-meta">
-                    {isEdu ? item.institution : item.company}
-                    {item.duration || item.graduation_date
-                      ? ` · ${item.duration || item.graduation_date}`
-                      : ""}
+                    {item.company}
+                    {item.duration ? ` · ${item.duration}` : ""}
                   </p>
-                  {(item.responsibilities || item.details) ? (
-                    <p>{item.responsibilities || item.details}</p>
-                  ) : null}
+                  {item.responsibilities ? <p>{item.responsibilities}</p> : null}
                 </div>
               </article>
-            );
-          }}
-        />
+            )}
+          />
+        ) : null}
+
+        {eduItems.length > 0 ? (
+          <SectionList
+            id="education"
+            title="Education"
+            subtitle="Academic background."
+            items={eduItems}
+            onVisible={onSectionVisible}
+            renderItem={(item, index) => (
+              <article className="pf-timeline-item" key={`edu-${index}`}>
+                <div className="pf-timeline-dot" />
+                <div className="pf-timeline-content">
+                  <h3>{item.degree}</h3>
+                  <p className="pf-timeline-meta">
+                    {item.institution}
+                    {item.graduation_date ? ` · ${item.graduation_date}` : ""}
+                  </p>
+                </div>
+              </article>
+            )}
+          />
+        ) : null}
 
         <SectionList
+          id="achievements"
           title="Achievements"
           items={profile?.achievements}
+          onVisible={onSectionVisible}
           renderItem={(item, index) => (
             <article className="pf-card" key={`ach-${index}`}>
               <h3>{item?.title}</h3>
@@ -267,8 +439,10 @@ function Share() {
         />
 
         <SectionList
+          id="certifications"
           title="Certifications"
           items={profile?.certifications}
+          onVisible={onSectionVisible}
           renderItem={(item, index) => (
             <article className="pf-card" key={`cert-${index}`}>
               <h3>{item?.name}</h3>
@@ -280,9 +454,11 @@ function Share() {
         />
 
         <SectionList
+          id="testimonials"
           title="What People Say"
           subtitle="Testimonials from colleagues and clients."
           items={profile?.testimonials}
+          onVisible={onSectionVisible}
           renderItem={(item, index) => (
             <article className="pf-testimonial" key={`test-${index}`}>
               <blockquote>&ldquo;{item?.recommendation}&rdquo;</blockquote>
@@ -304,8 +480,8 @@ function Share() {
           )}
         />
 
-        {(profile?.professional_philosophy || profile?.career_objectives) ? (
-          <section className="pf-section">
+        {hasGoals ? (
+          <section className="pf-section pf-section-animate" id="goals">
             <h2 className="pf-section-title">Goals & Philosophy</h2>
             <div className="pf-cards">
               {profile?.professional_philosophy ? (
@@ -324,8 +500,8 @@ function Share() {
           </section>
         ) : null}
 
-        {Array.isArray(profile?.hobbies) && profile.hobbies.length > 0 ? (
-          <section className="pf-section">
+        {hasHobbies ? (
+          <section className="pf-section pf-section-animate" id="hobbies">
             <h2 className="pf-section-title">Hobbies</h2>
             <div className="pf-tags">
               {profile.hobbies.map((h, i) => (
@@ -353,9 +529,15 @@ function Share() {
                 Give me a call
               </a>
             ) : null}
-            {profile?.cv ? (
-              <a href={getMediaUrl(profile.cv)} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-outline">
-                Download CV
+            {cvUrl ? (
+              <a
+                href={cvUrl}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pf-btn pf-btn-outline"
+              >
+                Download my CV
               </a>
             ) : null}
             {Array.isArray(profile?.social_links) && profile.social_links.length > 0 ? (
