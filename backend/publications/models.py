@@ -19,6 +19,7 @@ class PortfolioProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="portfolio_profile")
     full_name = models.CharField(max_length=255, blank=True)
     photo = models.ImageField(upload_to="profiles/", blank=True, null=True)
+    cv = models.FileField(upload_to="cvs/", blank=True, null=True)
     contact_email = models.EmailField(blank=True)
     phone = models.CharField(max_length=64, blank=True)
     location = models.CharField(max_length=255, blank=True)

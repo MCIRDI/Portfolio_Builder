@@ -86,6 +86,7 @@ function ProfileEditor() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [existingPhoto, setExistingPhoto] = useState("");
+  const [existingCV, setExistingCV] = useState("");
   const [formData, setFormData] = useState({
     full_name: "",
     contact_email: "",
@@ -98,6 +99,7 @@ function ProfileEditor() {
     soft_skills_text: "",
     hobbies_text: "",
     photo: null,
+    cv: null,
     social_links: [cloneTemplate(EMPTY_SOCIAL_LINK)],
     work_experience: [cloneTemplate(EMPTY_EXPERIENCE)],
     education: [cloneTemplate(EMPTY_EDUCATION)],
@@ -137,6 +139,7 @@ function ProfileEditor() {
           testimonials: normalizeObjectList(profile.testimonials, EMPTY_TESTIMONIAL),
         }));
         setExistingPhoto(getMediaUrl(profile.photo || ""));
+        setExistingCV(profile.cv || "");
       } catch (apiError) {
         console.error("Profile loading error:", apiError);
         setError(apiError.message || "Failed to load profile");
@@ -184,6 +187,14 @@ function ProfileEditor() {
     setFormData((currentData) => ({
       ...currentData,
       photo: nextPhoto,
+    }));
+  };
+
+  const handleCVChange = (event) => {
+    const nextCV = event.target.files?.[0] || null;
+    setFormData((currentData) => ({
+      ...currentData,
+      cv: nextCV,
     }));
   };
 
@@ -263,6 +274,10 @@ function ProfileEditor() {
 
     if (formData.photo) {
       payload.append("photo", formData.photo);
+    }
+
+    if (formData.cv) {
+      payload.append("cv", formData.cv);
     }
 
     try {
@@ -350,6 +365,14 @@ function ProfileEditor() {
           <label htmlFor="photo">Profile photo</label>
           <input id="photo" name="photo" type="file" accept="image/*" onChange={handlePhotoChange} />
           {existingPhoto ? <img src={getMediaUrl(existingPhoto)} alt="Current profile" className="editor-preview" /> : null}
+
+          <label htmlFor="cv">CV / Resume (PDF)</label>
+          <input id="cv" name="cv" type="file" accept=".pdf,.doc,.docx" onChange={handleCVChange} />
+          {existingCV ? (
+            <div className="editor-preview">
+              <p>Current CV: <a href={getMediaUrl(existingCV)} target="_blank" rel="noopener noreferrer">View CV</a></p>
+            </div>
+          ) : null}
 
           <div className="section-card">
             <div className="section-card-top">

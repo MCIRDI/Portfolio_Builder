@@ -353,6 +353,11 @@ function Share() {
                 Give me a call
               </a>
             ) : null}
+            {profile?.cv ? (
+              <a href={getMediaUrl(profile.cv)} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-outline">
+                Download CV
+              </a>
+            ) : null}
             {Array.isArray(profile?.social_links) && profile.social_links.length > 0 ? (
               <div className="pf-social">
                 {profile.social_links.map((link, i) => (
