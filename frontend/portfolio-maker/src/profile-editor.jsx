@@ -138,13 +138,23 @@ function ProfileEditor() {
         }));
         setExistingPhoto(getMediaUrl(profile.photo || ""));
       } catch (apiError) {
-        setError(apiError.message);
+        console.error("Profile loading error:", apiError);
+        setError(apiError.message || "Failed to load profile");
       } finally {
         setLoading(false);
       }
     }
 
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        setLoading(false);
+        setError("Loading timed out. Please refresh the page.");
+      }
+    }, 10000); // 10 second timeout
+
     loadProfile();
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const sectionCompletion = useMemo(() => {
@@ -271,6 +281,7 @@ function ProfileEditor() {
       <main className="editor-page">
         <section className="editor-shell">
           <p className="state-message">Loading profile...</p>
+          {error && <div className="form-error">{error}</div>}
         </section>
       </main>
     );
