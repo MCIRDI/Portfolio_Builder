@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://portfolio-backend.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "https://portfolio-builder-7i56.onrender.com";
 
 const authHeader = () => {
   const token = localStorage.getItem("token");
