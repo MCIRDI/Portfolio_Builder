@@ -6,6 +6,7 @@ import { getMediaUrl } from "./utils/helpers";
 function Edit() {
   const navigate = useNavigate();
   const { id } = useParams();
+  console.log("Edit component mounted, ID:", id);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -21,10 +22,12 @@ function Edit() {
 
   useEffect(() => {
     async function loadPublication() {
+      console.log("Loading publication with ID:", id);
       setLoading(true);
       setError("");
       try {
         const publication = await getPublication(id);
+        console.log("Publication loaded:", publication);
         setFormData({
           name: publication.name || "",
           description: publication.description || "",
@@ -37,15 +40,28 @@ function Edit() {
             : "",
           image: null,
         });
-        setExistingImage(getMediaUrl(publication.image || ""));
+        setExistingImage(publication.image || "");
+        console.log("Form data set, existing image:", publication.image);
       } catch (apiError) {
-        setError(apiError.message);
+        console.error("Publication loading error:", apiError);
+        setError(apiError.message || "Failed to load project");
       } finally {
+        console.log("Loading completed");
         setLoading(false);
       }
     }
 
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        console.log("Loading timeout triggered");
+        setLoading(false);
+        setError("Loading timed out. Please refresh the page.");
+      }
+    }, 10000); // 10 second timeout
+
     loadPublication();
+
+    return () => clearTimeout(timeoutId);
   }, [id]);
 
   const handleInputChange = (event) => {
@@ -105,14 +121,18 @@ function Edit() {
   };
 
   if (loading) {
+    console.log("Edit component: showing loading state");
     return (
       <main className="editor-page">
         <section className="editor-shell">
           <p className="state-message">Loading project...</p>
+          {error && <div className="form-error">{error}</div>}
         </section>
       </main>
     );
   }
+
+  console.log("Edit component: rendering form, loading:", loading, "error:", error);
 
   return (
     <main className="editor-page">
