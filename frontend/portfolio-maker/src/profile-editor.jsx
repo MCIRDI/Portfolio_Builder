@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getMyProfile, updateMyProfile } from "./services/publications";
 import { getMediaUrl } from "./utils/helpers";
 
