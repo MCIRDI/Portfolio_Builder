@@ -99,15 +99,15 @@ function Share() {
   const hasHobbies =
     Array.isArray(profile?.hobbies) && profile.hobbies.length > 0;
 
+  const hasContact = profile?.contact_email || profile?.phone || (Array.isArray(profile?.social_links) && profile.social_links.length > 0);
+
   const navSections = useMemo(() => {
     const s = [];
     if (publications.length > 0) s.push({ id: "projects", label: "Projects" });
-    if (hasTechSkills) s.push({ id: "tech", label: "Tech Stack" });
-    if (hasSoftSkills) s.push({ id: "soft-skills", label: "Soft Skills" });
     if (hasWorkExp) s.push({ id: "experience", label: "Experience" });
-    s.push({ id: "contact", label: "Contact" });
+    if (hasContact) s.push({ id: "contact", label: "Contact" });
     return s;
-  }, [publications.length, hasTechSkills, hasSoftSkills, hasWorkExp]);
+  }, [publications.length, hasWorkExp, hasContact]);
 
   const workItems = useMemo(
     () =>
