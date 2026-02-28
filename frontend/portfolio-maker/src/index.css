@@ -698,6 +698,7 @@ textarea {
     transform var(--transition-md),
     box-shadow var(--transition-md),
     border-color var(--transition-md);
+  max-width: 350px;
 }
 
 .project-card:hover {
@@ -1426,8 +1427,8 @@ textarea {
 }
 
 .pf-hero-photo {
-  width: 180px;
-  height: 180px;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
   border: 3px solid rgba(248, 250, 252, 0.3);
   overflow: hidden;
@@ -1520,7 +1521,7 @@ textarea {
 }
 
 .pf-project-image {
-  aspect-ratio: 4/3;
+  height: 100%;
   background: #f1f5f9;
   overflow: hidden;
 }
