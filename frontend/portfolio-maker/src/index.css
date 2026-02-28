@@ -1932,3 +1932,36 @@ textarea {
     padding-inline: 1rem;
   }
 }
+
+.pf-contact-icons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pf-contact-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(248, 250, 252, 0.1);
+  border: 1px solid rgba(248, 250, 252, 0.2);
+  color: #f8fafc;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.pf-contact-icon:hover {
+  background: rgba(248, 250, 252, 0.2);
+  border-color: rgba(248, 250, 252, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.pf-contact-icon svg {
+  width: 20px;
+  height: 20px;
+}
