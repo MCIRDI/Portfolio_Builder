@@ -85,9 +85,8 @@ function Share() {
     profile.education.some(
       (i) => i && Object.values(i || {}).some((v) => v && String(v).trim()),
     );
-  const hasSkills =
-    (Array.isArray(profile?.technical_skills) && profile.technical_skills.length > 0) ||
-    (Array.isArray(profile?.soft_skills) && profile.soft_skills.length > 0);
+  const hasTechSkills = Array.isArray(profile?.technical_skills) && profile.technical_skills.length > 0;
+  const hasSoftSkills = Array.isArray(profile?.soft_skills) && profile.soft_skills.length > 0;
   const hasAchievements =
     Array.isArray(profile?.achievements) && profile.achievements.length > 0;
   const hasCertifications =
@@ -103,10 +102,12 @@ function Share() {
   const navSections = useMemo(() => {
     const s = [];
     if (publications.length > 0) s.push({ id: "projects", label: "Projects" });
+    if (hasTechSkills) s.push({ id: "tech", label: "Tech Stack" });
+    if (hasSoftSkills) s.push({ id: "soft-skills", label: "Soft Skills" });
     if (hasWorkExp) s.push({ id: "experience", label: "Experience" });
     s.push({ id: "contact", label: "Contact" });
     return s;
-  }, [publications.length, hasWorkExp]);
+  }, [publications.length, hasTechSkills, hasSoftSkills, hasWorkExp]);
 
   const workItems = useMemo(
     () =>
@@ -294,27 +295,34 @@ function Share() {
           </section>
         ) : null}
 
-        {hasSkills ? (
+        {Array.isArray(profile?.technical_skills) && profile.technical_skills.length > 0 ? (
           <section className="pf-section pf-section-animate" id="tech">
             <h2 className="pf-section-title">Tech Stack</h2>
             <p className="pf-section-subtitle">
               Technologies and tools I work with.
             </p>
             <div className="pf-tags pf-tags-large">
-              {Array.isArray(profile?.technical_skills)
-                ? profile.technical_skills.map((s, i) => (
-                    <span key={`tech-${i}`} className="pf-tag">
-                      {s}
-                    </span>
-                  ))
-                : null}
-              {Array.isArray(profile?.soft_skills)
-                ? profile.soft_skills.map((s, i) => (
-                    <span key={`soft-${i}`} className="pf-tag pf-tag-soft">
-                      {s}
-                    </span>
-                  ))
-                : null}
+              {profile.technical_skills.map((s, i) => (
+                <span key={`tech-${i}`} className="pf-tag">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {Array.isArray(profile?.soft_skills) && profile.soft_skills.length > 0 ? (
+          <section className="pf-section pf-section-animate" id="soft-skills">
+            <h2 className="pf-section-title">Soft Skills</h2>
+            <p className="pf-section-subtitle">
+              Interpersonal and communication abilities.
+            </p>
+            <div className="pf-tags pf-tags-large">
+              {profile.soft_skills.map((s, i) => (
+                <span key={`soft-${i}`} className="pf-tag pf-tag-soft">
+                  {s}
+                </span>
+              ))}
             </div>
           </section>
         ) : null}
