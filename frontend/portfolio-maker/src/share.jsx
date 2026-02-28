@@ -1,31 +1,16 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getPublicProfile, getUserPublications } from "./services/publications";
 import { getMediaUrl } from "./utils/helpers";
 import iconPlaceholder from "./assets/icon-placeholder.svg";
 
-function SectionList({ id, title, subtitle, items, renderItem, onVisible }) {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (!onVisible || !ref.current) return;
-    const el = ref.current;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) onVisible(id);
-      },
-      { threshold: 0.3, rootMargin: "-80px 0px -30% 0px" },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [id, onVisible]);
-
+function SectionList({ id, title, subtitle, items, renderItem }) {
   if (!Array.isArray(items) || items.length === 0) {
     return null;
   }
 
   return (
-    <section className="pf-section pf-section-animate" id={id} ref={ref}>
+    <section className="pf-section pf-section-animate" id={id}>
       <h2 className="pf-section-title">{title}</h2>
       {subtitle ? <p className="pf-section-subtitle">{subtitle}</p> : null}
       <div className="pf-list">{items.map(renderItem)}</div>
@@ -39,8 +24,7 @@ function Share() {
   const [publications, setPublications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeSection, setActiveSection] = useState("hero");
-  const sectionRefs = useRef({});
+  const [scrollPercent, setScrollPercent] = useState(0);
 
   useEffect(() => {
     async function fetchPublicPortfolio() {
@@ -119,29 +103,10 @@ function Share() {
   const navSections = useMemo(() => {
     const s = [];
     if (publications.length > 0) s.push({ id: "projects", label: "Projects" });
-    if (hasSkills) s.push({ id: "tech", label: "Tech Stack" });
-    if (profile?.summary) s.push({ id: "about", label: "About" });
     if (hasWorkExp) s.push({ id: "experience", label: "Experience" });
-    if (hasEducation) s.push({ id: "education", label: "Education" });
-    if (hasAchievements) s.push({ id: "achievements", label: "Achievements" });
-    if (hasCertifications) s.push({ id: "certifications", label: "Certifications" });
-    if (hasTestimonials) s.push({ id: "testimonials", label: "Testimonials" });
-    if (hasGoals) s.push({ id: "goals", label: "Goals" });
-    if (hasHobbies) s.push({ id: "hobbies", label: "Hobbies" });
     s.push({ id: "contact", label: "Contact" });
     return s;
-  }, [
-    publications.length,
-    hasSkills,
-    profile?.summary,
-    hasWorkExp,
-    hasEducation,
-    hasAchievements,
-    hasCertifications,
-    hasTestimonials,
-    hasGoals,
-    hasHobbies,
-  ]);
+  }, [publications.length, hasWorkExp]);
 
   const workItems = useMemo(
     () =>
@@ -158,26 +123,17 @@ function Share() {
     [profile?.education],
   );
 
-  const onSectionVisible = (id) => setActiveSection(id);
-
   useEffect(() => {
-    if (loading || !profile) return;
-    const ids = ["hero", ...navSections.map((s) => s.id)];
-    const observers = [];
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveSection(id);
-        },
-        { threshold: 0.2, rootMargin: "-100px 0px -40% 0px" },
-      );
-      obs.observe(el);
-      observers.push(() => obs.disconnect());
-    });
-    return () => observers.forEach((fn) => fn());
-  }, [loading, profile, navSections]);
+    const onScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? Math.min(100, (scrollTop / docHeight) * 100) : 0;
+      setScrollPercent(pct);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [loading]);
 
   useEffect(() => {
     if (loading || !profile) return;
@@ -198,7 +154,7 @@ function Share() {
 
   if (loading) {
     return (
-      <main className="pf-page">
+      <main className="pf-page pf-page-dark">
         <div className="pf-loading">
           <div className="pf-spinner" />
           <p>Loading portfolio...</p>
@@ -208,28 +164,24 @@ function Share() {
   }
 
   return (
-    <main className="pf-page">
+    <main className="pf-page pf-page-dark">
       <div className="pf-progress-track">
-        <div className="pf-progress-line">
+        <div className="pf-progress-bar">
           <div
-            className={`pf-progress-dot ${activeSection === "hero" ? "active" : ""}`}
-            onClick={() => document.getElementById("hero")?.scrollIntoView({ behavior: "smooth" })}
+            className="pf-progress-fill"
+            style={{ height: `${scrollPercent}%` }}
           />
-          {navSections.map(({ id }) => (
-            <div
-              key={id}
-              className={`pf-progress-dot ${activeSection === id ? "active" : ""}`}
-              onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })}
-            />
-          ))}
         </div>
       </div>
 
       <div className="pf-hero-bg">
         <nav className="pf-nav">
-          <Link to="/" className="pf-nav-brand">
-            Portfolio Forge
-          </Link>
+          <span
+            className="pf-nav-brand"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          >
+            {displayName}
+          </span>
           <div className="pf-nav-links">
             {navSections.map(({ id, label }) => (
               <a key={id} href={`#${id}`}>
@@ -288,13 +240,7 @@ function Share() {
 
       <div className="pf-content">
         {publications.length > 0 ? (
-          <section
-            className="pf-section pf-section-animate"
-            id="projects"
-            ref={(el) => {
-              sectionRefs.current.projects = el;
-            }}
-          >
+          <section className="pf-section pf-section-animate" id="projects">
             <h2 className="pf-section-title">Featured Projects</h2>
             <p className="pf-section-subtitle">
               A selection of projects I&apos;ve worked on.
@@ -386,7 +332,6 @@ function Share() {
             title="Experience"
             subtitle="My professional journey."
             items={workItems}
-            onVisible={onSectionVisible}
             renderItem={(item, index) => (
               <article className="pf-timeline-item" key={`work-${index}`}>
                 <div className="pf-timeline-dot" />
@@ -409,7 +354,6 @@ function Share() {
             title="Education"
             subtitle="Academic background."
             items={eduItems}
-            onVisible={onSectionVisible}
             renderItem={(item, index) => (
               <article className="pf-timeline-item" key={`edu-${index}`}>
                 <div className="pf-timeline-dot" />
@@ -429,7 +373,6 @@ function Share() {
           id="achievements"
           title="Achievements"
           items={profile?.achievements}
-          onVisible={onSectionVisible}
           renderItem={(item, index) => (
             <article className="pf-card" key={`ach-${index}`}>
               <h3>{item?.title}</h3>
@@ -442,7 +385,6 @@ function Share() {
           id="certifications"
           title="Certifications"
           items={profile?.certifications}
-          onVisible={onSectionVisible}
           renderItem={(item, index) => (
             <article className="pf-card" key={`cert-${index}`}>
               <h3>{item?.name}</h3>
@@ -458,7 +400,6 @@ function Share() {
           title="What People Say"
           subtitle="Testimonials from colleagues and clients."
           items={profile?.testimonials}
-          onVisible={onSectionVisible}
           renderItem={(item, index) => (
             <article className="pf-testimonial" key={`test-${index}`}>
               <blockquote>&ldquo;{item?.recommendation}&rdquo;</blockquote>

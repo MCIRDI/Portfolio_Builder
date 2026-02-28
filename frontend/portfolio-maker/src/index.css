@@ -1063,88 +1063,165 @@ textarea {
   }
 }
 
-/* ========== Public Portfolio (David Horov style) ========== */
+/* ========== Public Portfolio (Dark) ========== */
 .pf-page {
   min-height: 100vh;
-  background: #fafafa;
-  color: #1a1a1a;
+  background: #0f172a;
+  color: #e2e8f0;
   font-family: var(--font-body);
   position: relative;
 }
 
+.pf-page-dark .pf-content {
+  background: #0f172a;
+}
+
+.pf-page-dark .pf-section-title {
+  color: #f8fafc;
+}
+
+.pf-page-dark .pf-section-subtitle,
+.pf-page-dark .pf-about-text,
+.pf-page-dark .pf-muted {
+  color: #94a3b8;
+}
+
+.pf-page-dark .pf-project-card,
+.pf-page-dark .pf-card,
+.pf-page-dark .pf-testimonial {
+  background: #1e293b;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.pf-page-dark .pf-project-card:hover,
+.pf-page-dark .pf-card:hover,
+.pf-page-dark .pf-testimonial:hover {
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+.pf-page-dark .pf-project-body h3,
+.pf-page-dark .pf-card h3,
+.pf-page-dark .pf-testimonial-author strong {
+  color: #f8fafc;
+}
+
+.pf-page-dark .pf-project-role,
+.pf-page-dark .pf-project-desc,
+.pf-page-dark .pf-card p,
+.pf-page-dark .pf-timeline-meta {
+  color: #94a3b8;
+}
+
+.pf-page-dark .pf-testimonial blockquote {
+  color: #cbd5e1;
+}
+
+.pf-page-dark .pf-timeline-content h3,
+.pf-page-dark .pf-timeline-content p {
+  color: #e2e8f0;
+}
+
+.pf-page-dark .pf-tag {
+  background: rgba(30, 41, 59, 0.8);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.pf-page-dark .pf-tag:hover {
+  background: rgba(51, 65, 85, 0.9);
+  color: #e2e8f0;
+}
+
+.pf-page-dark .pf-tag-soft {
+  background: rgba(30, 41, 59, 0.8);
+  color: #fbbf24;
+}
+
+.pf-page-dark .pf-project-image {
+  background: #1e293b;
+}
+
+.pf-page-dark .pf-project-links a,
+.pf-page-dark .pf-social a {
+  color: #38bdf8;
+}
+
+.pf-page-dark .pf-project-links a:hover,
+.pf-page-dark .pf-social a:hover {
+  color: #7dd3fc;
+}
+
+.pf-page-dark .pf-contact {
+  background: rgba(30, 41, 59, 0.5);
+}
+
+.pf-page-dark .pf-contact .pf-btn-primary {
+  background: #0ea5e9;
+  color: #fff;
+}
+
+.pf-page-dark .pf-contact .pf-btn-outline {
+  border-color: rgba(148, 163, 184, 0.5);
+  color: #e2e8f0;
+}
+
+.pf-page-dark .pf-contact .pf-btn-outline:hover {
+  border-color: #94a3b8;
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.pf-page-dark .pf-footer {
+  border-top-color: rgba(148, 163, 184, 0.2);
+  color: #94a3b8;
+}
+
+.pf-page-dark .pf-footer a {
+  color: #38bdf8;
+}
+
+.pf-nav-brand {
+  cursor: pointer;
+}
+
 .pf-progress-track {
   position: fixed;
-  right: 24px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 90;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.pf-progress-line {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.pf-progress-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #cbd5e1;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.pf-progress-dot:hover {
-  background: #94a3b8;
-  transform: scale(1.2);
-}
-
-.pf-progress-dot.active {
-  background: #0ea5e9;
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
-}
-
-.pf-progress-line {
-  position: relative;
-}
-
-.pf-progress-line::before {
-  content: "";
-  position: absolute;
+  right: 20px;
   top: 0;
   bottom: 0;
-  left: 4px;
-  width: 2px;
+  width: 4px;
+  z-index: 90;
+}
+
+.pf-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 100%;
-  background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 50%, #e2e8f0 100%);
-  border-radius: 2px;
-  z-index: -1;
+  background: rgba(51, 65, 85, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pf-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #0ea5e9, #38bdf8);
+  border-radius: 4px;
+  transition: height 0.1s ease-out;
 }
 
 .pf-hero-bg {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #334155 100%);
+  background: #0f172a;
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(14, 165, 233, 0.25), transparent),
-    radial-gradient(ellipse 60% 40% at 100% 0%, rgba(34, 197, 94, 0.15), transparent),
-    linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #334155 100%);
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(14, 165, 233, 0.12), transparent 60%),
+    radial-gradient(ellipse 50% 30% at 100% 20%, rgba(30, 41, 59, 0.8), transparent);
   color: #f8fafc;
   padding-bottom: 4rem;
   position: relative;
   overflow: hidden;
-}
-
-.pf-hero-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  opacity: 0.5;
-  pointer-events: none;
 }
 
 .pf-hero-zone .pf-hero-greeting {
@@ -1224,13 +1301,17 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  color: #64748b;
+  color: #94a3b8;
+}
+
+.pf-page-dark .pf-loading {
+  color: #94a3b8;
 }
 
 .pf-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #e2e8f0;
+  border: 3px solid rgba(148, 163, 184, 0.3);
   border-top-color: #0ea5e9;
   border-radius: 50%;
   animation: spin 800ms linear infinite;
