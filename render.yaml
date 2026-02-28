@@ -34,11 +34,18 @@ services:
 
         value: ".onrender.com,localhost,127.0.0.1"
 
+      - key: CORS_ALLOWED_ORIGINS
+
+        value: "https://buildmyfolio.vercel.app,https://localhost:5173"
+
       - key: CORS_ALLOWED_ORIGIN_REGEXES
 
         value: "^https://.*\\.vercel\\.app$"
 
+      - key: CSRF_TRUSTED_ORIGINS
+
+        value: "https://buildmyfolio.vercel.app"
+
       - key: DATABASE_URL
 
-        value: "postgresql://postgres:[YOUR-PASSWORD]@vvzqclsdmbxnfoejoyau.supabase.co:5432/postgres"
-
+        value: "postgresql://neondb_owner:npg_W2zIaCwd0Jhq@ep-snowy-field-akq99hcy-pooler.c-3.us-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
