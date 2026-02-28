@@ -653,6 +653,13 @@ textarea {
   padding: 1rem 1.05rem;
 }
 
+.editor-shell,
+.portfolio-shell {
+  position: relative;
+  overflow: hidden;
+  animation: shell-rise-in 640ms ease-out 60ms forwards;
+}
+
 .section-heading {
   display: flex;
   justify-content: space-between;
@@ -904,6 +911,11 @@ textarea {
   flex-wrap: wrap;
 }
 
+.portfolio-header-hero {
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+}
+
 .portfolio-header h1 {
   margin-top: 0.58rem;
 }
@@ -1032,6 +1044,17 @@ textarea {
 @keyframes rise-in {
   from {
     transform: translateY(14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shell-rise-in {
+  from {
+    transform: translateY(18px) scale(0.99);
     opacity: 0;
   }
   to {

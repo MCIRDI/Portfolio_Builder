@@ -289,7 +289,7 @@ function ProfileEditor() {
 
   return (
     <main className="editor-page">
-      <section className="editor-shell">
+      <section className="editor-shell stagger">
         <div className="section-heading">
           <div>
             <p className="chip">Portfolio Profile</p>

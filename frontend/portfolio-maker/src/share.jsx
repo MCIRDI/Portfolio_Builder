@@ -81,8 +81,8 @@ function Share() {
 
   return (
     <main className="portfolio-page">
-      <section className="portfolio-shell">
-        <header className="portfolio-header">
+      <section className="portfolio-shell stagger">
+        <header className="portfolio-header portfolio-header-hero">
           <div>
             <p className="chip">Public portfolio</p>
             <h1>{profile?.full_name || profile?.username || "Unknown user"}</h1>
@@ -180,14 +180,9 @@ function Share() {
           </section>
         ) : null}
 
-        <section className="portfolio-section">
-          <h2>Projects / work samples</h2>
-          {publications.length === 0 ? (
-            <div className="empty-state">
-              <h3>No projects published yet</h3>
-              <p>This profile is active but has no public project cards yet.</p>
-            </div>
-          ) : (
+        {publications.length > 0 ? (
+          <section className="portfolio-section">
+            <h2>Projects / work samples</h2>
             <div className="project-grid">
               {publications.map((publication) => (
                 <article className="project-card public" key={publication.id}>
@@ -222,8 +217,8 @@ function Share() {
                 </article>
               ))}
             </div>
-          )}
-        </section>
+          </section>
+        ) : null}
 
         <SectionList
           title="Achievements"
