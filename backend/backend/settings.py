@@ -154,6 +154,11 @@ CORS_ALLOWED_ORIGIN_REGEXES = get_list_env(
     "CORS_ALLOWED_ORIGIN_REGEXES",
     default=r"^https://.*\.vercel\.app$",
 )
+
+# Temporary fix for CORS issues
+if os.getenv("CORS_ALLOW_ALL_ORIGINS") == "True":
+    CORS_ALLOW_ALL_ORIGINS = True
+
 CSRF_TRUSTED_ORIGINS = get_list_env(
     "CSRF_TRUSTED_ORIGINS",
     default="",
