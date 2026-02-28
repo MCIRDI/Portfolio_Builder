@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { getMyProfile, updateMyProfile } from "./services/publications";
+import { getMediaUrl } from "./utils/helpers";
 
 const EMPTY_SOCIAL_LINK = { platform: "", url: "" };
 const EMPTY_EXPERIENCE = {
@@ -135,7 +136,7 @@ function ProfileEditor() {
           certifications: normalizeObjectList(profile.certifications, EMPTY_CERTIFICATION),
           testimonials: normalizeObjectList(profile.testimonials, EMPTY_TESTIMONIAL),
         }));
-        setExistingPhoto(profile.photo || "");
+        setExistingPhoto(getMediaUrl(profile.photo || ""));
       } catch (apiError) {
         setError(apiError.message);
       } finally {
@@ -337,7 +338,7 @@ function ProfileEditor() {
 
           <label htmlFor="photo">Profile photo</label>
           <input id="photo" name="photo" type="file" accept="image/*" onChange={handlePhotoChange} />
-          {existingPhoto ? <img src={existingPhoto} alt="Current profile" className="editor-preview" /> : null}
+          {existingPhoto ? <img src={getMediaUrl(existingPhoto)} alt="Current profile" className="editor-preview" /> : null}
 
           <div className="section-card">
             <div className="section-card-top">

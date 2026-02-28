@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { getPublicUser, getPublications } from "./services/publications";
+import { getMediaUrl } from "./utils/helpers";
 import iconPlaceholder from "./assets/icon-placeholder.svg";
-import { getPublicProfile, getUserPublications } from "./services/publications";
 
 function SectionList({ title, items, renderItem }) {
   if (!Array.isArray(items) || items.length === 0) {
@@ -97,7 +98,7 @@ function Share() {
         <section className="portfolio-section">
           <h2>Personal info</h2>
           <div className="profile-hero-card">
-            {profile?.photo ? <img src={profile.photo} alt={profile.full_name || "Profile"} className="profile-photo" /> : null}
+            {profile?.photo ? <img src={getMediaUrl(profile.photo)} alt={profile.full_name || "Profile"} className="profile-photo" /> : null}
             <div>
               <h3>{profile?.full_name || profile?.username || "Portfolio Owner"}</h3>
               {profile?.contact_email ? <p>{profile.contact_email}</p> : null}
@@ -191,7 +192,7 @@ function Share() {
               {publications.map((publication) => (
                 <article className="project-card public" key={publication.id}>
                   <img
-                    src={publication.image || iconPlaceholder}
+                    src={getMediaUrl(publication.image) || iconPlaceholder}
                     alt={publication.name}
                     className="project-thumb"
                   />

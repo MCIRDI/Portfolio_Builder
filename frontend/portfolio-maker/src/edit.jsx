@@ -1,6 +1,7 @@
-import { Link, useParams, useNavigate } from "react-router-dom";
-import { getPublication, updatePublication } from "./services/publications";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, Link } from "react-router-dom";
+import { createPublication, getPublication, updatePublication } from "./services/publications";
+import { getMediaUrl } from "./utils/helpers";
 
 function Edit() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ function Edit() {
             : "",
           image: null,
         });
-        setExistingImage(publication.image || "");
+        setExistingImage(getMediaUrl(publication.image || ""));
       } catch (apiError) {
         setError(apiError.message);
       } finally {
@@ -141,7 +142,7 @@ function Edit() {
           <input type="file" id="image" name="image" accept="image/*" onChange={handleImageChange} />
 
           {existingImage ? (
-            <img src={existingImage} alt={formData.name || "Current project"} className="editor-preview" />
+            <img src={getMediaUrl(existingImage)} alt={formData.name || "Current project"} className="editor-preview" />
           ) : null}
 
           <label htmlFor="description">Project description</label>
