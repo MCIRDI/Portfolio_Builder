@@ -296,7 +296,7 @@ function Share() {
 
         {hasSkills ? (
           <section className="pf-section pf-section-animate" id="tech">
-            <h2 className="pf-section-title">My Tech Stack</h2>
+            <h2 className="pf-section-title">Tech Stack</h2>
             <p className="pf-section-subtitle">
               Technologies and tools I work with.
             </p>
@@ -470,17 +470,6 @@ function Share() {
                 Give me a call
               </a>
             ) : null}
-            {cvUrl ? (
-              <a
-                href={cvUrl}
-                download
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pf-btn pf-btn-outline"
-              >
-                Download my CV
-              </a>
-            ) : null}
             {Array.isArray(profile?.social_links) && profile.social_links.length > 0 ? (
               <div className="pf-social">
                 {profile.social_links.map((link, i) => (
@@ -499,7 +488,7 @@ function Share() {
         </section>
 
         <footer className="pf-footer">
-          <p>© {new Date().getFullYear()} {displayName}. Built with Portfolio Forge.</p>
+          <p>© {new Date().getFullYear()} {displayName}. Built with Portfolio Builder.</p>
           <Link to="/">Create your portfolio</Link>
         </footer>
       </div>
