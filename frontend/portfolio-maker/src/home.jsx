@@ -203,15 +203,6 @@ function Home() {
                   <h3>{publication.name}</h3>
                   <p>{publication.description}</p>
                   {publication.role ? <p className="muted-line">Role: {publication.role}</p> : null}
-                  {Array.isArray(publication.technologies) && publication.technologies.length > 0 ? (
-                    <div className="tag-list">
-                      {publication.technologies.map((tool) => (
-                        <span key={`${publication.id}-${tool}`} className="tag">
-                          {tool}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
                 </div>
                 <div className="project-actions">
                   <Link to={`/dashboard/edit/${publication.id}`} className="btn btn-secondary">
