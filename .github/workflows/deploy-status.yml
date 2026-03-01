@@ -1,0 +1,45 @@
+name: Deployment Status
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check-deployment:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check Backend Health
+      run: |
+        echo "🔍 Checking backend health..."
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://portfolio-backend.onrender.com/health/)
+        if [ $response = "200" ]; then
+          echo "✅ Backend is healthy (HTTP $response)"
+        else
+          echo "❌ Backend is not healthy (HTTP $response)"
+        fi
+    
+    - name: Check Frontend Health
+      run: |
+        echo "🔍 Checking frontend health..."
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://buildmyfolio.vercel.app)
+        if [ $response = "200" ]; then
+          echo "✅ Frontend is healthy (HTTP $response)"
+        else
+          echo "❌ Frontend is not healthy (HTTP $response)"
+        fi
+    
+    - name: Deployment Summary
+      run: |
+        echo "📊 Deployment Summary"
+        echo "====================="
+        echo "Backend: https://portfolio-backend.onrender.com"
+        echo "Frontend: https://buildmyfolio.vercel.app"
+        echo ""
+        echo "🚀 Auto-deployment should trigger:"
+        echo "• Render: Backend deployment"
+        echo "• Vercel: Frontend deployment"
+        echo ""
+        echo "⏱️ Both should complete within 1-2 minutes"
